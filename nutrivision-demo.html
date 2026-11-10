@@ -1,0 +1,2182 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriVisionAI — Demo nền tảng dinh dưỡng</title>
+  <style>
+    :root {
+      --bg: #f7fbf6;
+      --panel: #ffffff;
+      --panel-2: #f1f8ef;
+      --border: #e8eee8;
+      --text: #18251e;
+      --muted: #718078;
+      --green: #39b86a;
+      --teal: #36b9c9;
+      --amber: #ffc631;
+      --rose: #ff765f;
+      --blue: #5599ee;
+      --purple: #a673ed;
+      --shadow: 0 12px 35px rgba(50, 93, 62, .09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 82% 4%, rgba(255, 213, 91, .16), transparent 23rem),
+        radial-gradient(circle at 10% 75%, rgba(102, 211, 121, .12), transparent 28rem),
+        var(--bg);
+      font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 4;
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, .92);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 2px 8px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #8bd63f, #ff8063);
+      box-shadow: 0 0 22px rgba(112, 202, 79, .25);
+      font-size: 21px;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 17px;
+      letter-spacing: -.3px;
+      color: #172019;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .nav {
+      margin-top: 24px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav button {
+      border: 1px solid transparent;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+      padding: 11px 12px;
+      border-radius: 12px;
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      transition: .2s;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      color: #149244;
+      background: #e1f7df;
+      border-color: #d2f0cf;
+    }
+
+    .nav .icon {
+      width: 21px;
+      text-align: center;
+    }
+
+    .badge {
+      margin-left: auto;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: 10px;
+      color: #8855d6;
+      background: #f0e7ff;
+    }
+
+    .user-card {
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: #f6fbf4;
+      border-radius: 15px;
+    }
+
+    .user-row {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffad52, #ff6d6d);
+    }
+
+    .user-card strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .user-card small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .logout {
+      border: 0;
+      color: #e86b68;
+      background: transparent;
+      font-size: 11px;
+      float: right;
+      margin-top: -22px;
+    }
+
+    main {
+      margin-left: 260px;
+      width: calc(100% - 260px);
+    }
+
+    .topbar {
+      height: 76px;
+      padding: 0 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 3;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .topbar p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status {
+      color: #159447;
+      font-size: 11px;
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .status i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green);
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      color: #415349;
+      background: #fff;
+      padding: 10px 14px;
+      border-radius: 11px;
+      font-weight: 700;
+      font-size: 12px;
+      transition: .2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(16, 185, 129, .5);
+    }
+
+    .btn.primary {
+      color: white;
+      border: 0;
+      background: linear-gradient(135deg, #2eb865, #16a89b);
+      box-shadow: 0 9px 24px rgba(56, 185, 106, .22);
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .content {
+      max-width: 1440px;
+      margin: auto;
+      padding: 30px 34px 50px;
+    }
+
+    .search {
+      width: min(280px, 30vw);
+      padding-left: 35px;
+      background: #f7faf6;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 205px;
+      padding: 28px 32px;
+      border: 0;
+      color: #173221;
+      background: linear-gradient(112deg, #d7f6b9 0%, #fff0a8 53%, #ffd1a4 100%);
+    }
+
+    .hero:before,
+    .hero:after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero:before {
+      width: 220px;
+      height: 220px;
+      right: 12%;
+      top: -110px;
+      background: rgba(255, 255, 255, .3);
+    }
+
+    .hero:after {
+      width: 150px;
+      height: 150px;
+      right: 2%;
+      bottom: -90px;
+      background: rgba(255, 255, 255, .22);
+    }
+
+    .hero h2 {
+      position: relative;
+      z-index: 1;
+      max-width: 490px;
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 36px);
+      letter-spacing: -1.2px;
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 470px;
+      margin: 0 0 18px;
+      color: #55705a;
+    }
+
+    .hero .btn {
+      position: relative;
+      z-index: 1;
+      background: #1b9b52;
+      color: #fff;
+      border: 0;
+    }
+
+    .hero-food {
+      position: absolute;
+      z-index: 1;
+      right: 8%;
+      bottom: -24px;
+      width: 160px;
+      height: 160px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 14px 28px rgba(104, 100, 38, .18);
+      font-size: 88px;
+      transform: rotate(-8deg);
+    }
+
+    .data-note {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-top: 12px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      color: #64736a;
+      background: #f7faf7;
+      border: 1px solid var(--border);
+      font-size: 10px;
+    }
+
+    .data-note b {
+      color: #258d50;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 9px;
+    }
+
+    .metric {
+      padding: 11px;
+      border-radius: 12px;
+      background: #fbfdfb;
+      border: 1px solid var(--border);
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 17px;
+    }
+
+    .metric small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 99px;
+      color: #19874a;
+      background: #e7f8e7;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .status-pill:before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr .8fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .pagination .btn {
+      padding: 7px 10px;
+    }
+
+    .view {
+      display: none;
+      animation: show .28s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes show {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      color: #25a85b;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      font-size: 10px;
+    }
+
+    h1 {
+      font-size: clamp(24px, 3vw, 35px);
+      margin: 5px 0;
+      letter-spacing: -1.1px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0;
+      max-width: 680px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .stats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .two {
+      grid-template-columns: 1.35fr 1fr;
+    }
+
+    .three {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .9);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 850;
+      margin: 6px 0 2px;
+      letter-spacing: -1px;
+    }
+
+    .stat-foot {
+      color: #1fa45b;
+      font-size: 11px;
+    }
+
+    .stat-foot.warn {
+      color: #fbbf24;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 17px;
+    }
+
+    .card-head h3 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .card-head span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .ring-wrap {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .ring {
+      width: 162px;
+      height: 162px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--green) 0 68%, #1e293b 68% 100%);
+      position: relative;
+    }
+
+    .ring:after {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .ring-center {
+      z-index: 1;
+      text-align: center;
+    }
+
+    .ring-center strong {
+      display: block;
+      font-size: 29px;
+    }
+
+    .ring-center small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .macro {
+      display: grid;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .macro-line {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .macro-line strong {
+      color: var(--text);
+    }
+
+    .bar {
+      height: 7px;
+      border-radius: 10px;
+      background: #edf1ed;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+    }
+
+    .chart {
+      height: 210px;
+      display: flex;
+      align-items: end;
+      gap: 12px;
+      padding: 20px 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chart-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: end;
+    }
+
+    .chart-col i {
+      width: 100%;
+      max-width: 34px;
+      border-radius: 8px 8px 2px 2px;
+      background: linear-gradient(#22c55e, #0891b2);
+      min-height: 10px;
+    }
+
+    .chart-col small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .meal-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .meal {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: #fbfdfb;
+    }
+
+    .meal-photo {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #d9f6c6, #fff2c2);
+      font-size: 25px;
+    }
+
+    .meal strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .meal small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .meal b {
+      margin-left: auto;
+      font-size: 12px;
+      color: #fcd34d;
+    }
+
+    .notice {
+      padding: 13px 15px;
+      border-radius: 13px;
+      color: #34736a;
+      background: #edfbf1;
+      border: 1px solid #d5f1d8;
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      color: var(--muted);
+      background: transparent;
+      padding: 8px 13px;
+      font-size: 11px;
+    }
+
+    .tab.active {
+      color: #148d45;
+      background: #e2f7df;
+      border-color: #bfe9bd;
+    }
+
+    .upload {
+      min-height: 325px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px dashed rgba(72, 190, 103, .55);
+      border-radius: 17px;
+      background: radial-gradient(circle, rgba(155, 226, 122, .24), transparent 60%), #f5fcf2;
+    }
+
+    .upload .upload-icon {
+      font-size: 44px;
+      margin-bottom: 10px;
+    }
+
+    .upload h3 {
+      margin: 0 0 5px;
+    }
+
+    .upload p {
+      margin: 0 auto 16px;
+      color: var(--muted);
+      font-size: 12px;
+      max-width: 380px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    label {
+      color: #526259;
+      display: grid;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      color: var(--text);
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 11px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .1);
+    }
+
+    .review-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 9px;
+    }
+
+    .review-row .remove {
+      border: 0;
+      background: transparent;
+      color: #fb7185;
+      float: right;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    th,
+    td {
+      padding: 13px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 11px;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .pill {
+      padding: 4px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, .12);
+    }
+
+    .pill.red {
+      color: #fecdd3;
+      background: rgba(244, 63, 94, .12);
+    }
+
+    .donut {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(#818cf8 0 24%, #f59e0b 24% 72%, #f43f5e 72%);
+    }
+
+    .donut:after {
+      content: "Macro";
+      display: grid;
+      place-items: center;
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--muted);
+    }
+
+    .report-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 35px;
+      min-height: 220px;
+    }
+
+    .legend {
+      display: grid;
+      gap: 11px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .legend span:before {
+      content: "";
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+      margin-right: 8px;
+      background: var(--c);
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 35px 10px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      place-items: center;
+      background: rgba(2, 6, 23, .72);
+      backdrop-filter: blur(7px);
+    }
+
+    .modal.open {
+      display: grid;
+    }
+
+    .modal-card {
+      width: min(460px, calc(100% - 30px));
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 30px 100px rgba(28, 55, 35, .25);
+    }
+
+    .modal-card h2 {
+      margin-top: 0;
+    }
+
+    .close {
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      float: right;
+      font-size: 21px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 12;
+      display: none;
+      padding: 13px 16px;
+      border-radius: 12px;
+      color: #eaffee;
+      background: #16834a;
+      border: 1px solid rgba(110, 231, 183, .3);
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show {
+      display: block;
+      animation: show .25s ease;
+    }
+
+    .card,
+    .metric,
+    .meal,
+    .notice,
+    .nav button,
+    .btn {
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .card:hover {
+      border-color: #d7ead8;
+      box-shadow: 0 16px 38px rgba(50, 93, 62, .12);
+    }
+
+    .meal:hover,
+    .metric:hover {
+      border-color: #bfe5c3;
+      transform: translateY(-2px);
+    }
+
+    .top-actions .search {
+      transition: width .25s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .top-actions .search:focus {
+      width: min(360px, 35vw);
+      background: #fff;
+    }
+
+    .chart-col {
+      position: relative;
+    }
+
+    .chart-col i {
+      transition: filter .2s ease, transform .2s ease;
+    }
+
+    .chart-col:hover i {
+      filter: saturate(1.35) brightness(1.06);
+      transform: scaleY(1.03);
+    }
+
+    .data-note b {
+      font-weight: 800;
+    }
+
+    .camera-modal .modal-card {
+      width: min(640px, calc(100% - 30px));
+    }
+
+    .camera-stage {
+      overflow: hidden;
+      min-height: 330px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: #10251b;
+    }
+
+    .camera-stage video {
+      display: block;
+      width: 100%;
+      min-height: 330px;
+      object-fit: cover;
+    }
+
+    .camera-placeholder {
+      padding: 45px 20px;
+      color: #bceecb;
+      text-align: center;
+    }
+
+    .camera-placeholder strong {
+      display: block;
+      margin: 8px 0 4px;
+      color: #fff;
+    }
+
+    .camera-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .camera-footer small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .detail-grid div {
+      padding: 10px;
+      border-radius: 11px;
+      background: #f7fbf7;
+      text-align: center;
+    }
+
+    .detail-grid strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .detail-grid small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .modal-card .detail-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .detail-list div {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .detail-list b {
+      color: var(--text);
+    }
+
+    .dashboard-detail {
+      grid-template-columns: 1fr 1fr 1fr;
+      margin-top: 16px;
+    }
+
+    .water-ring {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .water-circle {
+      width: 92px;
+      height: 92px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: conic-gradient(var(--blue) 0 64%, #e8f0f7 64%);
+      position: relative;
+    }
+
+    .water-circle:after {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .water-circle strong {
+      z-index: 1;
+      color: #438fdc;
+      font-size: 15px;
+    }
+
+    .water-copy strong {
+      display: block;
+      font-size: 20px;
+    }
+
+    .water-copy small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .water-actions {
+      display: flex;
+      gap: 5px;
+      margin-top: 12px;
+    }
+
+    .water-actions button {
+      width: 30px;
+      height: 27px;
+      border: 1px solid #dcecf8;
+      border-radius: 8px;
+      color: #418dd7;
+      background: #f3f9ff;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 11px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .timeline-time {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .timeline-dot {
+      width: 29px;
+      height: 29px;
+      display: grid;
+      place-items: center;
+      grid-column: 2;
+      grid-row: 1;
+      border-radius: 10px;
+      background: #fff1dc;
+      font-size: 15px;
+    }
+
+    .timeline-item .timeline-time {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .timeline-copy {
+      grid-column: 3;
+      grid-row: 1;
+      justify-self: start;
+    }
+
+    .timeline-copy strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .timeline-copy small {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .goal-list {
+      display: grid;
+      gap: 11px;
+    }
+
+    .goal-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .goal-row span {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .goal-row b {
+      font-size: 11px;
+    }
+
+    .scan-preview {
+      display: none;
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid #d5ecd7;
+      border-radius: 12px;
+      background: #f7fcf6;
+    }
+
+    .scan-preview.open {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scan-preview img {
+      width: 54px;
+      height: 54px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .scan-preview strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .scan-preview small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .scan-preview .btn {
+      margin-left: auto;
+    }
+
+    .scan-error {
+      display: none;
+      margin-top: 12px;
+      padding: 11px;
+      border: 1px solid #f3d0ca;
+      border-radius: 11px;
+      color: #b64f4d;
+      background: #fff6f4;
+      font-size: 11px;
+    }
+
+    .scan-error.open {
+      display: block;
+    }
+
+    @media (max-width: 1000px) {
+      .sidebar {
+        width: 218px;
+      }
+
+      main {
+        margin-left: 218px;
+        width: calc(100% - 218px);
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .two {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        min-height: auto;
+      }
+
+      .shell {
+        display: block;
+      }
+
+      main {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .nav {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .topbar {
+        padding: 0 18px;
+      }
+
+      .top-actions .status,
+      .search {
+        display: none;
+      }
+
+      .content {
+        padding: 22px 16px 35px;
+      }
+
+      .page-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .stats,
+      .three,
+      .form-grid,
+      .review-row,
+      .metric-grid,
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .ring-wrap {
+        flex-direction: column;
+      }
+
+      .hero-food {
+        right: -25px;
+        opacity: .55;
+      }
+
+      .detail-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dashboard-detail {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-mark">✦</div>
+          <div><strong>NutriVision <span style="color:#39b86a">AI</span></strong><small>Smart Health & Diet
+              Platform</small></div>
+        </div>
+        <nav class="nav" id="nav">
+          <button class="active" data-view="dashboard"><span class="icon">⌂</span> Tổng quan</button>
+          <button data-view="scan"><span class="icon">⌁</span> Quét món AI <span class="badge">AI</span></button>
+          <button data-view="history"><span class="icon">◫</span> Nhật ký bữa ăn</button>
+          <button data-view="reports"><span class="icon">◒</span> Báo cáo phân tích</button>
+          <button data-view="profile"><span class="icon">◎</span> Hồ sơ & mục tiêu</button>
+          <button data-view="admin"><span class="icon">◇</span> Quản trị viên <span class="badge">Admin</span></button>
+        </nav>
+      </div>
+      <div class="user-card">
+        <div class="user-row">
+          <div class="avatar">D</div>
+          <div><strong>Nguyễn Văn Dinh Dưỡng</strong><small>user@nutrivision.ai</small></div>
+        </div>
+        <button class="logout" onclick="showToast('Đây là bản demo trình bày — phiên demo vẫn được giữ lại.')">Đăng
+          xuất</button>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <h2 id="greeting">Chào buổi chiều, Dinh Dưỡng 👋</h2>
+          <p>Thứ Tư, 04 tháng 11, 2026 · Theo dõi dinh dưỡng cá nhân</p>
+        </div>
+        <div class="top-actions"><input class="search" placeholder="⌕  Tìm kiếm..." aria-label="Tìm kiếm"><span
+            class="status"><i></i> AI Vision Engine sẵn sàng</span><button class="btn primary"
+            onclick="openView('scan')">⌁ Quét món ngay</button></div>
+      </header>
+
+      <div class="content">
+        <section class="view active" id="dashboard">
+          <div class="card hero" style="margin-bottom:20px">
+            <h2>Ăn ngon hơn,<br>sống khỏe hơn mỗi ngày!</h2>
+            <p>NutriVision AI giúp bạn hiểu rõ hơn về bữa ăn và xây dựng thói quen dinh dưỡng cân bằng.</p><button
+              class="btn" onclick="openView('scan')">Phân tích bữa ăn <span>→</span></button>
+            <div class="hero-food">🥗</div>
+          </div>
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Daily intelligence</div>
+              <h1>Bảng theo dõi dinh dưỡng</h1>
+              <p class="subtitle">Tổng quan năng lượng và các nhóm chất hấp thụ hôm nay, được đồng bộ từ nền tảng
+                NutriVisionAI.</p>
+            </div><input style="width:160px" type="date" value="2026-11-04">
+          </div>
+          <div class="grid stats">
+            <div class="card">
+              <div class="stat-label">Calo hôm nay</div>
+              <div class="stat-value">1.496 <small style="font-size:13px;color:var(--muted)">kcal</small></div>
+              <div class="stat-foot">Còn lại 704 kcal</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">Số bữa đã ghi</div>
+              <div class="stat-value">02</div>
+              <div class="stat-foot">Đã xác nhận</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">Protein</div>
+              <div class="stat-value">88 <small style="font-size:13px;color:var(--muted)">g</small></div>
+              <div class="stat-foot">Đạt 64% mục tiêu</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">Chất xơ hôm nay</div>
+              <div class="stat-value">16 <small style="font-size:13px;color:var(--muted)">g</small></div>
+              <div class="stat-foot">Cần bổ sung thêm rau xanh</div>
+            </div>
+          </div>
+          <div class="grid two" style="margin-top:16px">
+            <div class="card">
+              <div class="card-head">
+                <h3>Tiến độ mục tiêu calo</h3><span>04/11/2026 · Mục tiêu 2.200 kcal</span>
+              </div>
+              <div class="ring-wrap">
+                <div class="ring">
+                  <div class="ring-center"><strong>68%</strong><small>1.496 / 2.200 kcal</small></div>
+                </div>
+                <div class="macro">
+                  <div>
+                    <div class="macro-line"><span>Đạm <strong>88 / 138g</strong></span><b style="color:#818cf8">64%</b>
+                    </div>
+                    <div class="bar"><i style="width:64%;background:#818cf8"></i></div>
+                  </div>
+                  <div>
+                    <div class="macro-line"><span>Tinh bột <strong>165 / 275g</strong></span><b
+                        style="color:#f59e0b">60%</b></div>
+                    <div class="bar"><i style="width:60%;background:#f59e0b"></i></div>
+                  </div>
+                  <div>
+                    <div class="macro-line"><span>Chất béo <strong>49 / 61g</strong></span><b
+                        style="color:#fb7185">80%</b></div>
+                    <div class="bar"><i style="width:80%;background:#fb7185"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Xu hướng 7 ngày</h3><span>kcal / ngày</span>
+              </div>
+              <div class="chart">
+                <div class="chart-col"><i style="height:78%"></i><small>T5</small></div>
+                <div class="chart-col"><i style="height:68%"></i><small>T6</small></div>
+                <div class="chart-col"><i style="height:82%"></i><small>T7</small></div>
+                <div class="chart-col"><i style="height:88%"></i><small>CN</small></div>
+                <div class="chart-col"><i style="height:73%"></i><small>T2</small></div>
+                <div class="chart-col"><i style="height:91%"></i><small>T3</small></div>
+                <div class="chart-col"><i style="height:68%;background:linear-gradient(#fbbf24,#f97316)"></i><small>Hôm
+                    nay</small></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid two" style="margin-top:16px">
+            <div class="card">
+              <div class="card-head">
+                <h3>Bữa ăn hôm nay</h3><button class="btn ghost" onclick="openView('history')">Xem nhật ký →</button>
+              </div>
+              <div class="meal-list">
+                <div class="meal">
+                  <div class="meal-photo">🍜</div>
+                  <div><strong>Phở bò tái chín</strong><small>Bữa sáng · 07:30 · AI · Đã xác nhận</small></div><b>485
+                    kcal</b>
+                </div>
+                <div class="meal">
+                  <div class="meal-photo">🍛</div>
+                  <div><strong>Cơm tấm sườn bì chả</strong><small>Bữa trưa · 12:15 · Đã hiệu chỉnh</small></div><b>1.011
+                    kcal</b>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Gợi ý thông minh</h3><span>AI Coach</span>
+              </div>
+              <div class="notice">Bạn đang duy trì mức năng lượng tốt. Bữa tối nên ưu tiên thêm rau xanh và nguồn đạm
+                nạc để cân bằng chất xơ.</div><button class="btn primary" style="margin-top:15px"
+                onclick="openView('scan')">Ghi nhận bữa ăn mới</button>
+            </div>
+          </div>
+          <div class="grid dashboard-detail">
+            <div class="card">
+              <div class="card-head">
+                <h3>Tiến độ uống nước</h3><span>1,6 / 2,5 L</span>
+              </div>
+              <div class="water-ring">
+                <div class="water-circle"><strong>64%</strong></div>
+                <div class="water-copy"><strong id="waterAmount">1,6 L</strong><small>Còn 0,9 L để đạt mục tiêu</small>
+                </div>
+              </div>
+              <div class="water-actions"><button onclick="addWater(0.25)">+250</button><button
+                  onclick="addWater(0.5)">+500</button><button onclick="resetWater()">↺</button></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Lịch trình hôm nay</h3><span>04/11/2026</span>
+              </div>
+              <div class="timeline">
+                <div class="timeline-item"><span class="timeline-time">07:30</span><span class="timeline-dot">🍜</span>
+                  <div class="timeline-copy"><strong>Bữa sáng đã ghi</strong><small>Phở bò tái nạm · 485 kcal</small>
+                  </div>
+                </div>
+                <div class="timeline-item"><span class="timeline-time">12:15</span><span class="timeline-dot">🍛</span>
+                  <div class="timeline-copy"><strong>Bữa trưa đã ghi</strong><small>Cơm tấm sườn bì chả · 1.011
+                      kcal</small></div>
+                </div>
+                <div class="timeline-item"><span class="timeline-time">19:00</span><span class="timeline-dot"
+                    style="background:#e8f5ff">✦</span>
+                  <div class="timeline-copy"><strong>Gợi ý bữa tối</strong><small>Ưu tiên rau xanh và đạm nạc</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Mục tiêu vi chất</h3><span>Hôm nay</span>
+              </div>
+              <div class="goal-list">
+                <div class="goal-row">
+                  <div><span>Chất xơ</span>
+                    <div class="bar"><i style="width:53%;background:#39b86a"></i></div>
+                  </div><b>16 / 30g</b>
+                </div>
+                <div class="goal-row">
+                  <div><span>Canxi</span>
+                    <div class="bar"><i style="width:68%;background:#5599ee"></i></div>
+                  </div><b>680 / 1.000mg</b>
+                </div>
+                <div class="goal-row">
+                  <div><span>Sắt</span>
+                    <div class="bar"><i style="width:74%;background:#ff765f"></i></div>
+                  </div><b>10 / 14mg</b>
+                </div>
+              </div>
+              <button class="btn" style="margin-top:13px" onclick="openView('reports')">Xem phân tích chi tiết
+                →</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="scan">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">AI vision workflow · Bước 01</div>
+              <h1>Quét & phân tích món ăn</h1>
+              <p class="subtitle">Tải ảnh hoặc chụp trực tiếp. AI sẽ nhận diện món, thành phần và ước tính khẩu phần.
+              </p>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="card">
+              <div class="tabs"><button class="tab active">Bữa trưa</button><button class="tab">Bữa sáng</button><button
+                  class="tab">Bữa tối</button><button class="tab">Bữa phụ</button></div>
+              <div class="upload" id="dropzone">
+                <div>
+                  <div class="upload-icon">📷</div>
+                  <h3>Kéo thả ảnh món ăn vào đây</h3>
+                  <p>Hỗ trợ .jpg, .png, .webp · tối đa 10MB. Ảnh sẽ được kiểm tra trước khi gửi lên AI.</p><button
+                    class="btn primary" onclick="document.getElementById('mealFile').click()">Chọn ảnh & bắt đầu nhận
+                    diện</button><button class="btn" style="margin-left:7px" onclick="openCamera()">Mở
+                    camera</button><input id="mealFile" type="file" accept=".jpg,.jpeg,.png,.webp" hidden>
+                  <div class="data-note">🛡️ <span><b>Luồng thật:</b> AI chỉ tạo bản nháp. Bạn phải kiểm tra và xác nhận
+                      trước khi bữa ăn được lưu chính thức.</span></div>
+                  <div class="scan-preview" id="scanPreview"><img id="scanPreviewImage" alt="Ảnh món ăn đã chọn">
+                    <div><strong id="scanFileName"></strong><small id="scanFileSize"></small></div><button class="btn"
+                      onclick="clearScanFile()">Xóa ảnh</button>
+                  </div>
+                  <div class="scan-error" id="scanError"></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Quy trình xử lý</h3><span>3 bước</span>
+              </div>
+              <div class="notice" style="margin-bottom:13px"><b>01 · Tải ảnh</b><br><span
+                  style="color:var(--muted)">Kiểm tra định dạng và kích thước tệp.</span></div>
+              <div class="notice" style="margin-bottom:13px;opacity:.72"><b>02 · Gemini Vision</b><br><span
+                  style="color:var(--muted)">Phân tích hình ảnh và trích xuất thành phần.</span></div>
+              <div class="notice" style="opacity:.5"><b>03 · Hiệu chỉnh & xác nhận</b><br><span
+                  style="color:var(--muted)">Người dùng kiểm tra trước khi lưu vào nhật ký.</span></div>
+              <div style="margin-top:22px;color:var(--muted);font-size:11px">⚡ Thời gian phản hồi mục tiêu: &lt; 3
+                giây<br>🛡️ Kết quả AI luôn cần người dùng xác nhận</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="review">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">AI vision workflow · Bước 02</div>
+              <h1>Kiểm tra & hiệu chỉnh kết quả</h1>
+              <p class="subtitle">AI đề xuất kết quả. Bạn có toàn quyền điều chỉnh trước khi xác nhận lưu.</p>
+            </div><button class="btn" onclick="openView('scan')">← Quét lại</button>
+          </div>
+          <div class="grid two">
+            <div class="card">
+              <div class="upload" style="min-height:290px;background:linear-gradient(135deg,#e4f8d3,#fff0c4)">
+                <div>
+                  <div style="font-size:75px">🍜</div>
+                  <h3>Phở bò tái chín</h3>
+                  <p>Ảnh món ăn đã tải lên · Kết quả nhận diện AI</p><span class="status-pill">Bản nháp · Chưa xác
+                    nhận</span>
+                </div>
+              </div>
+              <div class="metric-grid" style="margin-top:14px">
+                <div class="metric"><small>Calo</small><strong>485 kcal</strong></div>
+                <div class="metric"><small>Đạm</small><strong>28 g</strong></div>
+                <div class="metric"><small>Tinh bột</small><strong>65 g</strong></div>
+                <div class="metric"><small>Chất béo</small><strong>12 g</strong></div>
+                <div class="metric"><small>Chất xơ</small><strong>3 g</strong></div>
+              </div>
+              <div class="data-note">ℹ️ <span>Giá trị được tính từ tổng các <b>thành phần và khối lượng quy đổi</b>;
+                  thay đổi khẩu phần sẽ làm thay đổi tổng dinh dưỡng.</span></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Thành phần nhận diện</h3><span class="status-pill">Độ tin cậy 94,5%</span>
+              </div><label style="margin-bottom:12px">Tên món ăn<input value="Phở bò tái chín"></label>
+              <div id="review-items">
+                <div class="review-row"><label>Tên thành phần<input value="Phở bò tái chín"></label><label>Khối lượng
+                    quy đổi (g)<input type="number" value="450" min="1"></label><label>Khẩu phần<input type="number"
+                      value="1" min="0.01" step="0.01"></label><label>Đơn vị<select>
+                      <option>Bát lớn</option>
+                      <option>Gram</option>
+                      <option>Tô</option>
+                    </select></label></div>
+                <div class="review-row"><label>Tên thành phần<input value="Thịt bò tái"></label><label>Khối lượng quy
+                    đổi (g)<input type="number" value="80" min="1"></label><label>Khẩu phần<input type="number"
+                      value="1" min="0.01" step="0.01"></label><label>Đơn vị<select>
+                      <option>Miếng</option>
+                      <option>Gram</option>
+                    </select></label></div>
+              </div><button class="btn ghost" onclick="showToast('Đã thêm dòng thành phần mới.')">＋ Thêm thành
+                phần</button>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px"><button class="btn"
+                  onclick="openView('scan')">Hủy bỏ</button><button class="btn primary"
+                  onclick="showToast('Đã xác nhận và lưu bữa ăn thành công!');openView('dashboard')">✓ Xác nhận &
+                  lưu</button></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="history">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Meal journal</div>
+              <h1>Nhật ký bữa ăn</h1>
+              <p class="subtitle">Theo dõi toàn bộ bữa ăn đã xác nhận và kiểm soát tiến độ dinh dưỡng.</p>
+            </div><button class="btn primary" onclick="openView('scan')">＋ Thêm bữa ăn</button>
+          </div>
+          <div class="card">
+            <div class="tabs"><button class="tab active">7 ngày qua</button><button class="tab">30 ngày
+                qua</button><button class="tab">Tùy chỉnh ngày</button><button class="tab">Tất cả bữa ăn</button></div>
+            <div class="grid two" style="margin-bottom:18px">
+              <div class="notice"><b>04/11/2026 · 1.496 kcal</b><br><span style="color:var(--muted)">Đạt 68% mục tiêu
+                  2.200 kcal · 2 bữa đã ghi</span></div><select style="max-width:190px;justify-self:end">
+                <option>Tất cả loại bữa</option>
+                <option>Bữa sáng</option>
+                <option>Bữa trưa</option>
+                <option>Bữa tối</option>
+              </select>
+            </div>
+            <div class="meal-list">
+              <div class="meal">
+                <div class="meal-photo">🍜</div>
+                <div><strong>Phở bò tái nạm</strong><small>Bữa sáng · 04/11/2026 · Nhận diện AI · Đã xác nhận</small>
+                  <div style="color:var(--muted);font-size:10px;margin-top:3px">Protein 28g · Carbs 65g · Fat 12g</div>
+                </div><b>485 kcal</b><button class="btn ghost" onclick="openMealDetail('pho')">Chi tiết</button>
+              </div>
+              <div class="meal">
+                <div class="meal-photo">🍛</div>
+                <div><strong>Cơm tấm sườn bì chả</strong><small>Bữa trưa · 04/11/2026 · Đã hiệu chỉnh · Đã xác
+                    nhận</small>
+                  <div style="color:var(--muted);font-size:10px;margin-top:3px">Protein 60g · Carbs 100g · Fat 37g</div>
+                </div><b>1.011 kcal</b><button class="btn ghost" onclick="openMealDetail('com-tam')">Chi tiết</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="reports">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Nutrition analytics</div>
+              <h1>Báo cáo & phân tích</h1>
+              <p class="subtitle">Nhìn lại thói quen ăn uống, cân bằng nhóm chất và xuất dữ liệu phục vụ phân tích.</p>
+            </div><button class="btn primary" onclick="showToast('Báo cáo CSV đã được chuẩn bị để tải xuống.')">⇩ Xuất
+              báo cáo CSV</button>
+          </div>
+          <div class="grid stats">
+            <div class="card"><span class="stat-label">Calo trung bình / ngày</span>
+              <div class="stat-value">2.050</div><span class="stat-foot">−6.8% so với mục tiêu</span>
+            </div>
+            <div class="card"><span class="stat-label">Số ngày đạt mục tiêu</span>
+              <div class="stat-value">06<span style="font-size:15px;color:var(--muted)"> / 07</span></div><span
+                class="stat-foot">Tỷ lệ 85.7%</span>
+            </div>
+            <div class="card"><span class="stat-label">Protein trung bình</span>
+              <div class="stat-value">92g</div><span class="stat-foot">Đạt chuẩn</span>
+            </div>
+            <div class="card"><span class="stat-label">Bữa ăn đã phân tích</span>
+              <div class="stat-value">18</div><span class="stat-foot">12 từ AI · 6 thủ công</span>
+            </div>
+          </div>
+          <div class="grid two" style="margin-top:16px">
+            <div class="card">
+              <div class="card-head">
+                <h3>Xu hướng năng lượng theo ngày</h3><span>7 ngày gần nhất</span>
+              </div>
+              <div class="chart" style="height:250px">
+                <div class="chart-col"><i style="height:78%"></i><small>29/10</small></div>
+                <div class="chart-col"><i style="height:68%"></i><small>30/10</small></div>
+                <div class="chart-col"><i style="height:82%"></i><small>31/10</small></div>
+                <div class="chart-col"><i style="height:88%"></i><small>01/11</small></div>
+                <div class="chart-col"><i style="height:73%"></i><small>02/11</small></div>
+                <div class="chart-col"><i style="height:91%"></i><small>03/11</small></div>
+                <div class="chart-col"><i
+                    style="height:68%;background:linear-gradient(#fbbf24,#f97316)"></i><small>04/11</small></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Phân bổ năng lượng Macro</h3><span>Tuần hiện tại</span>
+              </div>
+              <div class="report-visual">
+                <div class="donut"></div>
+                <div class="legend"><span style="--c:#818cf8">Đạm · 24%</span><span style="--c:#f59e0b">Tinh bột ·
+                    48%</span><span style="--c:#f43f5e">Chất béo · 28%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-head">
+              <h3>Nhận xét thông minh từ AI Coach</h3><span>Được tạo từ dữ liệu thực tế</span>
+            </div>
+            <div class="notice">Mức tiêu thụ năng lượng đang bám sát mục tiêu TDEE. Hãy duy trì lượng protein hiện tại
+              và bổ sung thêm rau xanh để cải thiện chất xơ trong các bữa tối.</div>
+          </div>
+        </section>
+
+        <section class="view" id="profile">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Personal health profile</div>
+              <h1>Hồ sơ & mục tiêu thể trạng</h1>
+              <p class="subtitle">Các chỉ số BMR, TDEE và mục tiêu calo được tính theo công thức Mifflin–St Jeor.</p>
+            </div><button class="btn primary" onclick="showToast('Đã lưu hồ sơ và cập nhật mục tiêu.')">✓ Lưu thay
+              đổi</button>
+          </div>
+          <div class="grid two">
+            <div class="card">
+              <div class="card-head">
+                <h3>Thông tin cá nhân</h3><span>Đã xác thực</span>
+              </div>
+              <div class="form-grid"><label>Họ và tên<input value="Nguyễn Văn Dinh Dưỡng"></label><label>Email<input
+                    value="user@nutrivision.ai" disabled></label><label>Ngày sinh<input type="date"
+                    value="2000-01-01"></label><label>Giới tính<select>
+                    <option>Nam</option>
+                    <option>Nữ</option>
+                  </select></label><label>Chiều cao (cm)<input type="number" value="172" min="50"
+                    max="200"></label><label>Cân nặng (kg)<input type="number" value="68" min="10"
+                    max="150"></label><label>Mức độ vận động<select>
+                    <option>Vừa phải</option>
+                    <option>Ít vận động</option>
+                    <option>Năng động</option>
+                  </select></label></div>
+              <div class="data-note">✓ <span>Giới hạn hợp lệ theo API: chiều cao <b>50–200 cm</b>, cân nặng <b>10–150
+                    kg</b>, độ tuổi <b>10–100</b>.</span></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Chỉ số sức khỏe</h3><span>Mifflin–St Jeor</span>
+              </div>
+              <div class="grid three">
+                <div class="card" style="padding:14px"><span class="stat-label">BMI</span>
+                  <div class="stat-value" style="font-size:22px">23.0</div><span class="stat-foot">Bình thường</span>
+                </div>
+                <div class="card" style="padding:14px"><span class="stat-label">BMR</span>
+                  <div class="stat-value" style="font-size:22px">1.630</div><span class="stat-foot">kcal / ngày</span>
+                </div>
+                <div class="card" style="padding:14px"><span class="stat-label">TDEE</span>
+                  <div class="stat-value" style="font-size:22px">2.542</div><span class="stat-foot">kcal / ngày</span>
+                </div>
+              </div>
+              <div class="notice" style="margin-top:18px">Mục tiêu calo đề xuất: <b style="color:#1fa45b">2.200 kcal /
+                  ngày</b><br><span style="color:var(--muted)">Giá trị được tính tự động từ hồ sơ và mức vận
+                  động.</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="admin">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">System administration</div>
+              <h1>Bảng điều khiển quản trị</h1>
+              <p class="subtitle">Giám sát người dùng, nhật ký hệ thống và chất lượng nhận diện AI.</p>
+            </div><button class="btn" onclick="showToast('Dữ liệu quản trị đã được làm mới.')">↻ Làm mới</button>
+          </div>
+          <div class="grid stats">
+            <div class="card"><span class="stat-label">Tổng người dùng</span>
+              <div class="stat-value">1.248</div><span class="stat-foot">+12% tuần này</span>
+            </div>
+            <div class="card"><span class="stat-label">Lượt gọi AI</span>
+              <div class="stat-value">382</div><span class="stat-foot">Hôm nay</span>
+            </div>
+            <div class="card"><span class="stat-label">Độ chính xác AI</span>
+              <div class="stat-value">93.6%</div><span class="stat-foot">Từ 1.540 lượt xác nhận</span>
+            </div>
+            <div class="card"><span class="stat-label">Thời gian phản hồi</span>
+              <div class="stat-value">1.2s</div><span class="stat-foot">Trung bình</span>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-head">
+              <h3>Quản lý người dùng</h3>
+              <div><input id="userSearch" oninput="filterUsers()" placeholder="Tìm email hoặc họ tên..."
+                  style="width:220px"></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Người dùng</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Bữa ăn</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="users">
+                  <tr>
+                    <td><b>admin@nutrivision.ai</b><br><span style="color:var(--muted)">Trần Quản Trị</span></td>
+                    <td><span class="pill">ADMIN</span></td>
+                    <td><span class="pill">Hoạt động</span></td>
+                    <td>42</td>
+                    <td><button class="btn ghost" onclick="showToast('Không thể tự khóa tài khoản admin demo.')">Quản
+                        lý</button></td>
+                  </tr>
+                  <tr>
+                    <td><b>user@nutrivision.ai</b><br><span style="color:var(--muted)">Nguyễn Minh Anh</span></td>
+                    <td><span class="pill">USER</span></td>
+                    <td><span class="pill">Hoạt động</span></td>
+                    <td>18</td>
+                    <td><button class="btn ghost" onclick="showToast('Đã mở bảng thao tác người dùng.')">Quản
+                        lý</button></td>
+                  </tr>
+                  <tr>
+                    <td><b>spammer@botnet.org</b><br><span style="color:var(--muted)">Spam Bot 01</span></td>
+                    <td><span class="pill">USER</span></td>
+                    <td><span class="pill red">Đã khóa</span></td>
+                    <td>0</td>
+                    <td><button class="btn ghost" onclick="showToast('Tài khoản đang bị khóa.')">Mở khóa</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal camera-modal" id="cameraModal">
+    <div class="modal-card">
+      <button class="close" onclick="closeCamera()">×</button>
+      <div class="eyebrow">Live meal capture</div>
+      <h2>Chụp ảnh bữa ăn</h2>
+      <p class="subtitle">Đưa món ăn vào giữa khung hình, sau đó chụp để chuyển sang bước AI phân tích.</p>
+      <div class="camera-stage" style="margin-top:16px">
+        <video id="cameraVideo" autoplay playsinline hidden></video>
+        <div class="camera-placeholder" id="cameraPlaceholder">📷<strong>Camera chưa được bật</strong><span>Trình duyệt
+            sẽ yêu cầu quyền truy cập camera.</span></div>
+      </div>
+      <div class="camera-footer"><small>Khuyến nghị: ánh sáng tốt, chụp toàn bộ món ăn.</small><span><button class="btn"
+            onclick="closeCamera()">Hủy</button> <button class="btn primary" id="captureMeal" onclick="captureMeal()">●
+            Chụp & phân tích</button></span></div>
+    </div>
+  </div>
+
+  <div class="modal" id="mealDetailModal">
+    <div class="modal-card">
+      <button class="close" onclick="closeMealDetail()">×</button>
+      <div class="eyebrow">Meal record · Đã xác nhận</div>
+      <h2 id="detailTitle">Phở bò tái nạm</h2>
+      <p class="subtitle" id="detailMeta">Bữa sáng · 04/11/2026 · Nhận diện AI</p>
+      <div class="detail-grid">
+        <div><strong id="detailKcal">485</strong><small>kcal</small></div>
+        <div><strong id="detailProtein">28g</strong><small>đạm</small></div>
+        <div><strong id="detailCarbs">65g</strong><small>tinh bột</small></div>
+        <div><strong id="detailFat">12g</strong><small>chất béo</small></div>
+      </div>
+      <div class="detail-list" id="detailIngredients"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button class="btn"
+          onclick="closeMealDetail()">Đóng</button><button class="btn primary"
+          onclick="closeMealDetail();openView('review')">Chỉnh sửa bữa ăn</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="demoModal">
+    <div class="modal-card"><button class="close" onclick="closeModal()">×</button>
+      <div class="eyebrow">NutriVisionAI demo</div>
+      <h2 id="modalTitle">Đăng nhập demo</h2>
+      <p class="subtitle">Chọn vai trò để trình bày nhanh với giáo viên.</p>
+      <div class="form-grid" style="margin-top:18px"><label>Email<input value="user@nutrivision.ai"></label><label>Mật
+          khẩu<input type="password" value="User@123"></label></div><button class="btn primary"
+        style="margin-top:18px;width:100%"
+        onclick="closeModal();showToast('Đăng nhập demo thành công — chào mừng bạn!')">Bắt đầu demo</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const views = [...document.querySelectorAll(".view")];
+    const navButtons = [...document.querySelectorAll("#nav button")];
+    function openView(id) {
+      views.forEach(v => v.classList.toggle("active", v.id === id));
+      navButtons.forEach(b => b.classList.toggle("active", b.dataset.view === id));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (id === "review") document.getElementById("review").classList.add("active");
+      if (id === "scan" && !document.getElementById("mealFile")) restoreScanUploader();
+    }
+    navButtons.forEach(button => button.addEventListener("click", () => openView(button.dataset.view)));
+    function simulateScan() {
+      const zone = document.getElementById("dropzone");
+      zone.innerHTML = '<div><div class="upload-icon">✦</div><h3>Đang phân tích hình ảnh...</h3><p>Gemini Vision đang nhận diện món ăn và thành phần dinh dưỡng.</p><div class="bar" style="width:250px;margin:auto"><i id="scanProgress" style="width:20%;background:linear-gradient(90deg,#10b981,#06b6d4)"></i></div></div>';
+      let progress = 20;
+      const timer = setInterval(() => {
+        progress += 20;
+        const bar = document.getElementById("scanProgress");
+        if (bar) bar.style.width = progress + "%";
+        if (progress >= 100) { clearInterval(timer); showToast("AI nhận diện thành công với độ tin cậy 94.5%."); setTimeout(() => openView("review"), 500); }
+      }, 260);
+    }
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message; toast.classList.add("show");
+      clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+    let scanDropzone = document.getElementById("dropzone");
+    let mealFile = document.getElementById("mealFile");
+    let cameraStream = null;
+    const mealDetails = {
+      pho: {
+        title: "Phở bò tái nạm",
+        meta: "Bữa sáng · 04/11/2026 · Nhận diện AI · Đã xác nhận",
+        kcal: "485", protein: "28g", carbs: "65g", fat: "12g",
+        ingredients: [["Bánh phở", "180g", "198 kcal"], ["Thịt bò tái nạm", "80g", "176 kcal"], ["Nước dùng phở", "250ml", "76 kcal"], ["Rau thơm & giá", "30g", "35 kcal"]]
+      },
+      "com-tam": {
+        title: "Cơm tấm sườn bì chả",
+        meta: "Bữa trưa · 04/11/2026 · Đã hiệu chỉnh · Đã xác nhận",
+        kcal: "1.011", protein: "60g", carbs: "100g", fat: "37g",
+        ingredients: [["Cơm tấm", "220g", "310 kcal"], ["Sườn nướng", "150g", "420 kcal"], ["Bì & chả", "90g", "215 kcal"], ["Dưa chua & nước mắm", "45g", "66 kcal"]]
+      }
+    };
+    function openMealDetail(id) {
+      const meal = mealDetails[id];
+      if (!meal) return;
+      document.getElementById("detailTitle").textContent = meal.title;
+      document.getElementById("detailMeta").textContent = meal.meta;
+      document.getElementById("detailKcal").textContent = meal.kcal;
+      document.getElementById("detailProtein").textContent = meal.protein;
+      document.getElementById("detailCarbs").textContent = meal.carbs;
+      document.getElementById("detailFat").textContent = meal.fat;
+      document.getElementById("detailIngredients").innerHTML = meal.ingredients.map(item => `<div><span>${item[0]} · ${item[1]}</span><b>${item[2]}</b></div>`).join("");
+      document.getElementById("mealDetailModal").classList.add("open");
+    }
+    function closeMealDetail() { document.getElementById("mealDetailModal").classList.remove("open"); }
+    function validateMealFile(file) {
+      const allowed = ["image/jpeg", "image/png", "image/webp"];
+      if (!file) return false;
+      if (!allowed.includes(file.type)) { showToast("Định dạng không hợp lệ. Chỉ hỗ trợ JPG, PNG hoặc WEBP."); return false; }
+      if (file.size > 10 * 1024 * 1024) { showToast("Ảnh vượt quá giới hạn 10MB của API."); return false; }
+      return true;
+    }
+    function showScanPreview(file) {
+      const preview = document.getElementById("scanPreview");
+      document.getElementById("scanPreviewImage").src = URL.createObjectURL(file);
+      document.getElementById("scanFileName").textContent = file.name;
+      document.getElementById("scanFileSize").textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB · ${file.type.split("/")[1].toUpperCase()}`;
+      preview.classList.add("open");
+      document.getElementById("scanError").classList.remove("open");
+    }
+    function clearScanFile() {
+      mealFile.value = "";
+      document.getElementById("scanPreview").classList.remove("open");
+      showToast("Đã xóa ảnh đã chọn.");
+    }
+    function bindScanUploader() {
+      scanDropzone = document.getElementById("dropzone");
+      mealFile = document.getElementById("mealFile");
+      mealFile.addEventListener("change", event => {
+        const file = event.target.files[0];
+        if (validateMealFile(file)) {
+          showScanPreview(file);
+          showToast(`Đã nhận ảnh ${file.name}. Đang chuẩn bị phân tích...`);
+          setTimeout(simulateScan, 700);
+        }
+      });
+      scanDropzone.addEventListener("dragover", event => { event.preventDefault(); scanDropzone.style.borderColor = "var(--green)"; });
+      scanDropzone.addEventListener("dragleave", () => { scanDropzone.style.borderColor = ""; });
+      scanDropzone.addEventListener("drop", event => {
+        event.preventDefault(); scanDropzone.style.borderColor = "";
+        const file = event.dataTransfer.files[0];
+        if (validateMealFile(file)) { showScanPreview(file); showToast(`Đã nhận ảnh ${file.name}. Đang chuẩn bị phân tích...`); setTimeout(simulateScan, 700); }
+      });
+    }
+    function restoreScanUploader() {
+      const zone = document.getElementById("dropzone");
+      zone.innerHTML = `<div><div class="upload-icon">📷</div><h3>Kéo thả ảnh món ăn vào đây</h3><p>Hỗ trợ .jpg, .png, .webp · tối đa 10MB. Ảnh sẽ được kiểm tra trước khi gửi lên AI.</p><button class="btn primary" onclick="document.getElementById('mealFile').click()">Chọn ảnh & bắt đầu nhận diện</button><button class="btn" style="margin-left:7px" onclick="openCamera()">Mở camera</button><input id="mealFile" type="file" accept=".jpg,.jpeg,.png,.webp" hidden><div class="data-note">🛡️ <span><b>Luồng thật:</b> AI chỉ tạo bản nháp. Bạn phải kiểm tra và xác nhận trước khi bữa ăn được lưu chính thức.</span></div><div class="scan-preview" id="scanPreview"><img id="scanPreviewImage" alt="Ảnh món ăn đã chọn"><div><strong id="scanFileName"></strong><small id="scanFileSize"></small></div><button class="btn" onclick="clearScanFile()">Xóa ảnh</button></div><div class="scan-error" id="scanError"></div></div>`;
+      bindScanUploader();
+    }
+    bindScanUploader();
+    let waterTotal = 1.6;
+    function addWater(amount) {
+      waterTotal = Math.min(2.5, waterTotal + amount);
+      const percentage = Math.round((waterTotal / 2.5) * 100);
+      document.getElementById("waterAmount").textContent = waterTotal.toFixed(2).replace(".", ",") + " L";
+      document.querySelector(".water-circle").style.background = `conic-gradient(var(--blue) 0 ${percentage}%, #e8f0f7 ${percentage}%)`;
+      showToast(`Đã thêm ${Math.round(amount * 1000)}ml nước.`);
+    }
+    function resetWater() {
+      waterTotal = 1.6;
+      document.getElementById("waterAmount").textContent = "1,6 L";
+      document.querySelector(".water-circle").style.background = "conic-gradient(var(--blue) 0 64%, #e8f0f7 64%)";
+      showToast("Đã đặt lại tiến độ nước trong ngày.");
+    }
+    async function openCamera() {
+      const modal = document.getElementById("cameraModal");
+      modal.classList.add("open");
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("unsupported");
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+        const video = document.getElementById("cameraVideo");
+        video.srcObject = cameraStream; video.hidden = false;
+        document.getElementById("cameraPlaceholder").hidden = true;
+        showToast("Camera đã sẵn sàng.");
+      } catch (error) {
+        document.getElementById("cameraPlaceholder").hidden = false;
+        showToast("Không thể mở camera. Hãy chạy demo bằng localhost/HTTPS và cấp quyền truy cập.");
+      }
+    }
+    function closeCamera() {
+      if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+      const video = document.getElementById("cameraVideo");
+      video.srcObject = null; video.hidden = true;
+      document.getElementById("cameraPlaceholder").hidden = false;
+      document.getElementById("cameraModal").classList.remove("open");
+    }
+    function captureMeal() {
+      if (!cameraStream) { showToast("Hãy bật camera trước khi chụp."); return; }
+      closeCamera(); showToast("Đã chụp ảnh. AI đang phân tích...");
+      simulateScan();
+    }
+    function addReviewItem() {
+      const item = document.createElement("div");
+      item.className = "review-row";
+      item.innerHTML = `<label>Tên thành phần<input placeholder="Ví dụ: Rau xanh"></label><label>Khối lượng quy đổi (g)<input type="number" value="50" min="1"></label><label>Khẩu phần<input type="number" value="1" min="0.01" step="0.01"></label><label>Đơn vị<select><option>Gram</option><option>Phần</option><option>Đĩa</option></select></label><button class="remove" onclick="this.parentElement.remove()">× Xóa</button>`;
+      document.getElementById("review-items").appendChild(item);
+      showToast("Đã thêm thành phần để hiệu chỉnh.");
+    }
+    document.addEventListener("click", event => {
+      const button = event.target.closest("#review-items + .btn");
+      if (button) { event.preventDefault(); addReviewItem(); }
+      const tab = event.target.closest(".tab");
+      if (tab) {
+        tab.parentElement.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
+        tab.classList.add("active");
+        if (tab.textContent.includes("Tùy chỉnh")) showToast("Đã bật bộ lọc ngày tùy chỉnh.");
+      }
+    });
+    document.querySelector(".search").addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      const query = event.target.value.trim().toLowerCase();
+      if (!query) return;
+      const match = [...document.querySelectorAll(".meal strong")].find(item => item.textContent.toLowerCase().includes(query));
+      if (match) { openView("history"); match.closest(".meal").scrollIntoView({ behavior: "smooth", block: "center" }); showToast(`Đã tìm thấy "${match.textContent}".`); }
+      else showToast(`Không tìm thấy dữ liệu cho "${event.target.value.trim()}".`);
+    });
+    document.addEventListener("keydown", event => { if (event.key === "Escape") { closeModal(); closeCamera(); closeMealDetail(); } });
+    function closeModal() { document.getElementById("demoModal").classList.remove("open"); }
+    function filterUsers() {
+      const query = document.getElementById("userSearch").value.toLowerCase();
+      document.querySelectorAll("#users tr").forEach(row => row.style.display = row.textContent.toLowerCase().includes(query) ? "" : "none");
+    }
+    function syncDemoData() {
+      const profileName = document.querySelector(".user-card strong");
+      if (profileName) profileName.textContent = "Nguyễn Văn Dinh Dưỡng";
+      const avatar = document.querySelector(".avatar");
+      if (avatar) avatar.textContent = "D";
+      const profileInputs = document.querySelectorAll("#profile input");
+      if (profileInputs.length >= 6) {
+        profileInputs[0].value = "Nguyễn Văn Dinh Dưỡng";
+        profileInputs[4].value = "172";
+        profileInputs[5].value = "68";
+      }
+      const profileMetrics = document.querySelectorAll("#profile .grid.three .stat-value");
+      if (profileMetrics.length === 3) {
+        profileMetrics[0].textContent = "23.0";
+        profileMetrics[1].textContent = "1.630";
+        profileMetrics[2].textContent = "2.542";
+      }
+      const adminCards = document.querySelectorAll("#admin .stats .card");
+      const adminData = [
+        ["Tổng người dùng", "02", "Từ NguoiDung"],
+        ["Người dùng hoạt động", "02", "TrangThai = ACTIVE"],
+        ["Bữa ăn đã ghi", "00", "Đã xác nhận, chưa xóa"],
+        ["Lượt gọi AI", "00", "Từ lịch sử nhận diện"]
+      ];
+      adminCards.forEach((card, index) => {
+        if (!adminData[index]) return;
+        const label = card.querySelector(".stat-label");
+        const value = card.querySelector(".stat-value");
+        const foot = card.querySelector(".stat-foot");
+        label.textContent = adminData[index][0];
+        value.textContent = adminData[index][1];
+        foot.textContent = adminData[index][2];
+      });
+      const adminStats = document.querySelector("#admin .stats");
+      if (adminStats && !document.getElementById("adminAccuracy")) {
+        adminStats.insertAdjacentHTML("beforeend", `
+          <div class="card" id="adminAccuracy"><span class="stat-label">Tỷ lệ AI chính xác</span><div class="stat-value">95.0%</div><span class="stat-foot">Giá trị mặc định khi chưa có lượt quét</span></div>
+          <div class="card" id="adminResponse"><span class="stat-label">Phản hồi AI trung bình</span><div class="stat-value">850 <small style="font-size:13px;color:var(--muted)">ms</small></div><span class="stat-foot">Giá trị mặc định của API</span></div>`);
+      }
+      const historyCard = document.querySelector("#history .card");
+      if (historyCard && !document.getElementById("historyFilters")) {
+        const tabs = historyCard.querySelector(".tabs");
+        tabs.insertAdjacentHTML("afterend", `
+          <div class="filters" id="historyFilters">
+            <label>Từ ngày<input type="date" value="2026-10-29"></label>
+            <label>Đến ngày<input type="date" value="2026-11-04"></label>
+            <label>Loại bữa<select><option>Tất cả loại bữa</option><option>Bữa sáng</option><option>Bữa trưa</option><option>Bữa tối</option><option>Bữa phụ</option></select></label>
+          </div>`);
+        historyCard.insertAdjacentHTML("beforeend", `
+          <div class="pagination"><span>Hiển thị 1–2 trong 2 bữa ăn đã xác nhận</span><span><button class="btn" disabled>← Trước</button> <button class="btn">Sau →</button></span></div>`);
+      }
+      const reportHead = document.querySelector("#reports .page-head");
+      if (reportHead && !document.getElementById("pdfExport")) {
+        reportHead.querySelector(".btn.primary").insertAdjacentHTML("beforebegin", `<button id="pdfExport" class="btn" onclick="showToast('Báo cáo PDF demo đã được chuẩn bị.')">⇩ Xuất PDF</button>`);
+      }
+      const reviewItems = document.getElementById("review-items");
+      if (reviewItems) {
+        const reviewCard = reviewItems.closest(".card");
+        reviewCard.innerHTML = `
+          <div class="card-head"><h3>Thành phần nhận diện</h3><span class="status-pill">Độ tin cậy 94,5%</span></div>
+          <label style="margin-bottom:12px">Tên món ăn<input value="Phở bò tái chín"></label>
+          <div id="review-items">
+          <div class="review-row">
+            <label>Tên thành phần<input value="Phở bò tái chín"></label>
+            <label>Khối lượng quy đổi (g)<input type="number" value="450" min="1"></label>
+            <label>Khẩu phần<input type="number" value="1" min="0.01" step="0.01"></label>
+            <label>Đơn vị tính<select><option>Bát lớn</option><option>Gram</option><option>Tô</option></select></label>
+          </div>
+          <div class="review-row">
+            <label>Tên thành phần<input value="Thịt thăn bò áp chảo"></label>
+            <label>Khối lượng quy đổi (g)<input type="number" value="80" min="1"></label>
+            <label>Khẩu phần<input type="number" value="1" min="0.01" step="0.01"></label>
+            <label>Đơn vị tính<select><option>Miếng</option><option>Gram</option></select></label>
+          </div>
+          <div class="review-row">
+            <label>Tên thành phần<input value="Rau muống luộc"></label>
+            <label>Khối lượng quy đổi (g)<input type="number" value="30" min="1"></label>
+            <label>Khẩu phần<input type="number" value="1" min="0.01" step="0.01"></label>
+            <label>Đơn vị tính<select><option>Đĩa</option><option>Gram</option></select></label>
+          </div>
+          </div>
+          <button class="btn ghost" onclick="showToast('Đã thêm dòng thành phần mới.')">＋ Thêm thành phần</button>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+            <button class="btn" onclick="openView('scan')">Hủy bỏ</button>
+            <button class="btn primary" onclick="showToast('Đã xác nhận và lưu bữa ăn thành công!');openView('dashboard')">✓ Xác nhận & lưu</button>
+          </div>`;
+      }
+    }
+    syncDemoData();
+  </script>
+</body>
+
+</html>
