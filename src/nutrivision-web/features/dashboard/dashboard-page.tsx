@@ -13,6 +13,7 @@ import { CalorieBarChart } from "./week-chart";
 import { HeroCard } from "./hero-card";
 import { TodayMeals } from "./today-meals";
 import { Suggestions } from "./suggestions";
+import { MonthHeatmap } from "./month-heatmap";
 
 function DashboardSkeleton() {
   return (
@@ -84,11 +85,14 @@ export function DashboardPage() {
       )}
 
       <div className="grid items-start gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <section className="rounded-2xl border bg-card p-5 shadow-soft" aria-label="Calo 7 ngày gần nhất">
-          <h2 className="mb-1 text-lg font-extrabold">7 ngày gần nhất</h2>
-          <p className="mb-3 text-xs text-muted-foreground">Cột là calo mỗi ngày, vạch đỏ nét đứt là mục tiêu của bạn.</p>
-          <CalorieBarChart data={data.bayNgay} />
-        </section>
+        <div className="space-y-6">
+          <section className="rounded-2xl border bg-card p-5 shadow-soft" aria-label="Calo 7 ngày gần nhất">
+            <h2 className="mb-1 text-lg font-extrabold">7 ngày gần nhất</h2>
+            <p className="mb-3 text-xs text-muted-foreground">Cột là calo mỗi ngày, vạch đỏ nét đứt là mục tiêu của bạn.</p>
+            <CalorieBarChart data={data.bayNgay} />
+          </section>
+          <MonthHeatmap today={data.ngay} />
+        </div>
         <Suggestions />
       </div>
     </div>

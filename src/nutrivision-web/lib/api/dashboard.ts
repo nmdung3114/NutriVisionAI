@@ -1,7 +1,10 @@
 import { api, downloadFile } from "./client";
-import type { Dashboard, Report } from "@/types/api";
+import type { CalendarMonth, Dashboard, Report } from "@/types/api";
 
-export const dashboardApi = { get: () => api<Dashboard>("/api/dashboard") };
+export const dashboardApi = {
+  get: () => api<Dashboard>("/api/dashboard"),
+  calendar: (nam: number, thang: number) => api<CalendarMonth>("/api/dashboard/calendar", { query: { nam, thang } }),
+};
 
 export const reportsApi = {
   get: (from?: string, to?: string) => api<Report>("/api/reports", { query: { from, to } }),

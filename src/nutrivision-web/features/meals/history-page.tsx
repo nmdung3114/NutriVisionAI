@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +23,11 @@ type Preset = "today" | "7" | "30" | "custom";
 const PAGE_SIZE = 20;
 
 export function HistoryPage() {
-  const [preset, setPreset] = useState<Preset>("7");
-  const [custom, setCustom] = useState({ from: lastNDays(7).from, to: todayStr() });
+  // ?ngay=YYYY-MM-DD (từ lịch tháng) → mở sẵn đúng ngày đó
+  const ngayParam = useSearchParams().get("ngay");
+  const initialDay = ngayParam && /^\d{4}-\d{2}-\d{2}$/.test(ngayParam) ? ngayParam : null;
+  const [preset, setPreset] = useState<Preset>(initialDay ? "custom" : "7");
+  const [custom, setCustom] = useState(initialDay ? { from: initialDay, to: initialDay } : { from: lastNDays(7).from, to: todayStr() });
   const [loai, setLoai] = useState<LoaiBuaAn | "all">("all");
   const [page, setPage] = useState(1);
   const [toDelete, setToDelete] = useState<MealSummary | null>(null);

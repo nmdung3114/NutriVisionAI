@@ -290,3 +290,21 @@ export interface AdminStatistics {
   buaAnTheoNgay: DayCount[];
   aiTheoNgay: DayCount[];
 }
+
+export interface CalendarDay {
+  ngay: string;
+  calo: number;
+  mucTieuCalo: number;
+  soBuaAn: number;
+  phanTramMucTieu: number;
+  trangThai: DayState | null;
+}
+
+export interface CalendarMonth {
+  nam: number;
+  thang: number;
+  homNay: string;
+  soNgayCoDuLieu: number;
+  soNgayDatChuan: number;
+  ngay: CalendarDay[];
+}

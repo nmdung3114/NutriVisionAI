@@ -6,6 +6,7 @@ using NutriVision.Application.Modules.Audit;
 using NutriVision.Application.Modules.Auth;
 using NutriVision.Application.Modules.Dashboard;
 using NutriVision.Application.Modules.Foods;
+using NutriVision.Application.Modules.Habits;
 using NutriVision.Application.Modules.Meals;
 using NutriVision.Application.Modules.Profile;
 using NutriVision.Application.Modules.Reports;
@@ -34,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IMealService, MealService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IHabitService, HabitService>();
         services.AddScoped<ISuggestionService, SuggestionService>();
         services.AddScoped<IAdminService, AdminService>();
         return services;

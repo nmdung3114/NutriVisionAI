@@ -1,16 +1,22 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NutriVision.Application.Modules.Dashboard;
+using NutriVision.Application.Modules.Habits;
 using NutriVision.Application.Modules.Reports;
 using NutriVision.Application.Modules.Suggestions;
 
 namespace NutriVision.Api.Controllers;
 
 [Route("api/dashboard"), Authorize]
-public class DashboardController(IDashboardService dashboard) : ApiControllerBase
+public class DashboardController(IDashboardService dashboard, IHabitService habits) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Get(CancellationToken ct) => Success(await dashboard.GetAsync(ct));
+
+    /// <summary>Lịch nhiệt tháng (mặc định tháng hiện tại).</summary>
+    [HttpGet("calendar")]
+    public async Task<IActionResult> Calendar([FromQuery] int? nam, [FromQuery] int? thang, CancellationToken ct) =>
+        Success(await habits.GetCalendarAsync(nam, thang, ct));
 }
 
 [Route("api/suggestions"), Authorize]
