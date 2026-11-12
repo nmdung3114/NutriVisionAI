@@ -1,93 +1,124 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./shadcn-base.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-brand-50: #effaf3;
+  --color-brand-100: #d6f3e1;
+  --color-brand-500: #21b45a;
+  --color-brand-600: #1a9a4c;
+  --color-brand-700: #168d47;
+  --color-orange: #ff795e;
+  --color-yellow: #ffc934;
+  --color-blue: #4b9cf5;
+  --color-purple: #9d68ed;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --card-border: rgba(226, 232, 240, 0.8);
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
+  --background: #f5f8f6;
+  --foreground: #1a2420;
+  --card: #ffffff;
+  --card-foreground: #1a2420;
+  --popover: #ffffff;
+  --popover-foreground: #1a2420;
+  --primary: #1a9a4c;
+  --primary-foreground: #ffffff;
+  --secondary: #effaf3;
+  --secondary-foreground: #146b37;
+  --muted: #eef2f0;
+  --muted-foreground: #5b6b64;
+  --accent: #e6f6ec;
+  --accent-foreground: #146b37;
+  --destructive: #e5484d;
+  --border: #e3e9e6;
+  --input: #d5ded9;
+  --ring: #21b45a;
+  --chart-1: #21b45a;
+  --chart-2: #ff795e;
+  --chart-3: #ffc934;
+  --chart-4: #4b9cf5;
+  --chart-5: #9d68ed;
+  --radius: 0.75rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a2420;
+  --sidebar-primary: #1a9a4c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e6f6ec;
+  --sidebar-accent-foreground: #146b37;
+  --sidebar-border: #e3e9e6;
+  --sidebar-ring: #21b45a;
 }
 
-.dark {
-  --background: #090d16;
-  --foreground: #f1f5f9;
-  --card-bg: rgba(17, 24, 39, 0.75);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(17, 24, 39, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.12);
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  overflow-x: hidden;
-  min-height: 100vh;
+@layer utilities {
+  .shadow-soft {
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -8px rgba(16, 24, 40, 0.08);
+  }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+@keyframes scan-line {
+  0% { top: 0%; }
+  50% { top: calc(100% - 3px); }
+  100% { top: 0%; }
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
+.animate-scan-line {
+  animation: scan-line 2.4s ease-in-out infinite;
 }
-
-::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.25);
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.5);
-}
-
-/* Glassmorphism Classes */
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-}
-
-.glass-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--card-border);
-}
-
-.glass-dropdown {
-  background: rgba(17, 24, 39, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-/* Modern Glowing Ring */
-.glow-emerald {
-  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.45));
-}
-
-.glow-laser {
-  box-shadow: 0 0 20px 4px rgba(16, 185, 129, 0.7);
-}
-
-/* Gradient Text */
-.text-gradient-emerald {
-  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-gold {
-  background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+@media (prefers-reduced-motion: reduce) {
+  .animate-scan-line { animation: none; }
 }
