@@ -147,3 +147,37 @@ public class UserAggregateTests
         Assert.Equal(50m, s.TinhBot, 0);
     }
 }
+
+public class StreakCalculatorTests
+{
+    private static readonly DateOnly Today = new(2026, 11, 12);
+    private static IEnumerable<DateOnly> Days(params int[] offsets) => offsets.Select(o => Today.AddDays(-o));
+
+    [Fact]
+    public void Empty_history_has_no_streak() =>
+        Assert.Equal(new StreakResult(0, 0, null), StreakCalculator.Compute([], Today));
+
+    [Fact]
+    public void Current_streak_counts_back_from_today()
+    {
+        var r = StreakCalculator.Compute(Days(0, 1, 2, 4, 5), Today);
+        Assert.Equal(3, r.Current);
+        Assert.Equal(3, r.Longest);
+    }
+
+    [Fact]
+    public void Streak_ending_yesterday_is_kept_until_today_ends()
+    {
+        Assert.Equal(2, StreakCalculator.Compute(Days(1, 2), Today).Current);
+        Assert.Equal(0, StreakCalculator.Compute(Days(2, 3), Today).Current); // đứt hôm qua
+    }
+
+    [Fact]
+    public void Longest_streak_is_found_in_the_past_and_ignores_future_and_duplicates()
+    {
+        var r = StreakCalculator.Compute(Days(0, 10, 11, 12, 13, 13, -1, -2), Today);
+        Assert.Equal(1, r.Current);
+        Assert.Equal(4, r.Longest);
+        Assert.Equal(Today.AddDays(-10), r.LongestEnd);
+    }
+}

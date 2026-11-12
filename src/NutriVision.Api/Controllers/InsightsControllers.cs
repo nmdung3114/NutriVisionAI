@@ -17,6 +17,10 @@ public class DashboardController(IDashboardService dashboard, IHabitService habi
     [HttpGet("calendar")]
     public async Task<IActionResult> Calendar([FromQuery] int? nam, [FromQuery] int? thang, CancellationToken ct) =>
         Success(await habits.GetCalendarAsync(nam, thang, ct));
+
+    /// <summary>Chuỗi ngày ghi nhận liên tiếp và huy hiệu.</summary>
+    [HttpGet("streak")]
+    public async Task<IActionResult> Streak(CancellationToken ct) => Success(await habits.GetStreakAsync(ct));
 }
 
 [Route("api/suggestions"), Authorize]

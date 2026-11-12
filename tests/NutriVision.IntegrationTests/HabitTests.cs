@@ -49,4 +49,43 @@ public class HabitTests(ApiFactory f) : IntegrationTestBase(f)
         Assert.Equal(0, (await c.Get($"/api/dashboard/calendar?nam={today.Year + 1}&thang=1")).Data.GetProperty("ngay").GetArrayLength());
         Assert.Equal(401, (await (await Anonymous()).Get("/api/dashboard/calendar")).Status);
     }
+
+    [Fact]
+    public async Task Streak_And_Badges_Are_Computed_From_Confirmed_Meals()
+    {
+        var (c, _) = await NewVerifiedUser(); // mục tiêu 2000 kcal → đạm mục tiêu 100 g
+        var empty = (await c.Get("/api/dashboard/streak")).Data;
+        Assert.Equal(0, empty.GetProperty("chuoiHienTai").GetInt32());
+        Assert.All(empty.GetProperty("huyHieu").EnumerateArray(), b => Assert.False(b.GetProperty("datDuoc").GetBoolean()));
+
+        var today = Today;
+        // Hôm qua + 2 ngày trước: đủ 3 bữa chính, giàu đạm, nhiều xơ, đạt chuẩn calo
+        foreach (var d in new[] { today.AddDays(-1), today.AddDays(-2) })
+        {
+            await LogMeal(c, d, "Sang", 500, dam: 30, xo: 10);
+            await LogMeal(c, d, "Trua", 800, dam: 40, xo: 10);
+            await LogMeal(c, d, "Toi", 700, dam: 35, xo: 10);
+        }
+        await LogMeal(c, today.AddDays(-5), "Phu", 200); // chuỗi cũ, bị đứt
+
+        var s = (await c.Get("/api/dashboard/streak")).Data;
+        Assert.Equal(2, s.GetProperty("chuoiHienTai").GetInt32()); // hôm nay chưa ghi nhưng chuỗi vẫn giữ
+        Assert.False(s.GetProperty("homNayDaGhi").GetBoolean());
+        Assert.Equal(3, s.GetProperty("tongNgayGhiNhan").GetInt32());
+        Assert.Equal(7, s.GetProperty("tongBuaAn").GetInt32());
+
+        var badges = s.GetProperty("huyHieu").EnumerateArray().ToDictionary(b => b.GetProperty("ma").GetString()!);
+        Assert.True(badges["FIRST_MEAL"].GetProperty("datDuoc").GetBoolean());
+        Assert.False(badges["STREAK_3"].GetProperty("datDuoc").GetBoolean());
+        Assert.Equal(2, badges["STREAK_3"].GetProperty("tienDo").GetInt32());
+        Assert.Equal(2, badges["ON_TARGET_7"].GetProperty("tienDo").GetInt32());
+        Assert.Equal(2, badges["PROTEIN_5"].GetProperty("tienDo").GetInt32());
+        Assert.Equal(2, badges["FIBER_5"].GetProperty("tienDo").GetInt32());
+        Assert.Equal(2, badges["FULL_DAY_3"].GetProperty("tienDo").GetInt32());
+
+        await LogMeal(c, today, "Sang", 400);
+        var after = (await c.Get("/api/dashboard/streak")).Data;
+        Assert.Equal(3, after.GetProperty("chuoiHienTai").GetInt32());
+        Assert.True(after.GetProperty("huyHieu").EnumerateArray().Single(b => b.GetProperty("ma").GetString() == "STREAK_3").GetProperty("datDuoc").GetBoolean());
+    }
 }

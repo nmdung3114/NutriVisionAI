@@ -14,6 +14,7 @@ import { HeroCard } from "./hero-card";
 import { TodayMeals } from "./today-meals";
 import { Suggestions } from "./suggestions";
 import { MonthHeatmap } from "./month-heatmap";
+import { StreakCard } from "./streak-card";
 
 function DashboardSkeleton() {
   return (
@@ -93,7 +94,10 @@ export function DashboardPage() {
           </section>
           <MonthHeatmap today={data.ngay} />
         </div>
-        <Suggestions />
+        <div className="space-y-6">
+          <StreakCard />
+          <Suggestions />
+        </div>
       </div>
     </div>
   );

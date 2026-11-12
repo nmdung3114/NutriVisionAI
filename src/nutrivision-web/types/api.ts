@@ -308,3 +308,22 @@ export interface CalendarMonth {
   soNgayDatChuan: number;
   ngay: CalendarDay[];
 }
+
+export interface Badge {
+  ma: string;
+  ten: string;
+  moTa: string;
+  bieuTuong: string;
+  datDuoc: boolean;
+  tienDo: number;
+  mucTieu: number;
+}
+
+export interface Streak {
+  chuoiHienTai: number;
+  chuoiDaiNhat: number;
+  homNayDaGhi: boolean;
+  tongNgayGhiNhan: number;
+  tongBuaAn: number;
+  huyHieu: Badge[];
+}

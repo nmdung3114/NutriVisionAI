@@ -11,8 +11,15 @@ public record CalendarDayDto(DateOnly Ngay, decimal Calo, decimal MucTieuCalo, i
 
 public record CalendarDto(int Nam, int Thang, DateOnly HomNay, int SoNgayCoDuLieu, int SoNgayDatChuan, IReadOnlyList<CalendarDayDto> Ngay);
 
+public record BadgeDto(string Ma, string Ten, string MoTa, string BieuTuong, bool DatDuoc, int TienDo, int MucTieu);
+
+public record StreakDto(int ChuoiHienTai, int ChuoiDaiNhat, bool HomNayDaGhi, int TongNgayGhiNhan, int TongBuaAn, IReadOnlyList<BadgeDto> HuyHieu);
+
 public interface IHabitService
 {
+    /// <summary>Chuỗi ngày ghi nhận liên tiếp và huy hiệu (tính từ dữ liệu bữa ăn đã xác nhận, không lưu thêm bảng).</summary>
+    Task<StreakDto> GetStreakAsync(CancellationToken ct = default);
+
     /// <summary>Lịch nhiệt theo tháng: mỗi ngày đã qua của tháng kèm calo và trạng thái so với mục tiêu.</summary>
     Task<CalendarDto> GetCalendarAsync(int? nam, int? thang, CancellationToken ct = default);
 }
@@ -52,6 +59,51 @@ public class HabitService(IApplicationDbContext db, ICurrentUser currentUser, Ap
         }
 
         return new CalendarDto(nam, thang, today, days.Count(x => x.TrangThai != null), days.Count(x => x.TrangThai == "DatChuan"), days);
+    }
+
+    public async Task<StreakDto> GetStreakAsync(CancellationToken ct = default)
+    {
+        var userId = currentUser.RequireUserId();
+        var today = clock.Today;
+        var target = await CurrentTargetAsync(userId, ct);
+
+        var rows = await db.TongHopDinhDuongNgays.AsNoTracking()
+            .Where(t => t.NguoiDungId == userId && t.SoBuaAnDaGhi > 0 && t.Ngay <= today)
+            .Select(t => new { t.Ngay, t.TongCalo, t.TongChatDam, t.TongChatXo, t.MucTieuCaloNgay, t.SoBuaAnDaGhi })
+            .ToListAsync(ct);
+        var streak = StreakCalculator.Compute(rows.Select(r => r.Ngay), today);
+
+        var tongBua = rows.Sum(r => r.SoBuaAnDaGhi);
+        var datChuan = rows.Count(r =>
+        {
+            var t = r.MucTieuCaloNgay > 0 ? r.MucTieuCaloNgay : target;
+            return t > 0 && DashboardService.TrangThai(r.TongCalo / t * 100m) == "DatChuan";
+        });
+        var duXo = rows.Count(r => r.TongChatXo >= MacroTargets.FiberTargetGrams);
+        var duDam = rows.Count(r => r.TongChatDam >= MacroTargets.TargetGrams(r.MucTieuCaloNgay > 0 ? r.MucTieuCaloNgay : target).ChatDam);
+        var buaAi = await db.BuaAns.AsNoTracking().CountAsync(b => b.NguoiDungId == userId && b.DaXacNhan && !b.DaXoa && b.TaoTuAI, ct);
+        var ngayDu3Bua = (await db.BuaAns.AsNoTracking()
+                .Where(b => b.NguoiDungId == userId && b.DaXacNhan && !b.DaXoa && b.LoaiBuaAn != Domain.Constants.LoaiBuaAn.Phu)
+                .Select(b => new { b.NgayAn, b.LoaiBuaAn }).Distinct().ToListAsync(ct))
+            .GroupBy(x => x.NgayAn).Count(g => g.Count() >= 3);
+
+        BadgeDto Badge(string ma, string ten, string moTa, string icon, int tienDo, int mucTieu) =>
+            new(ma, ten, moTa, icon, tienDo >= mucTieu, Math.Min(tienDo, mucTieu), mucTieu);
+
+        var badges = new List<BadgeDto>
+        {
+            Badge("FIRST_MEAL", "Khởi đầu", "Ghi nhận bữa ăn đầu tiên", "🍽️", tongBua, 1),
+            Badge("STREAK_3", "Khởi động", "Ghi nhận 3 ngày liên tiếp", "🔥", streak.Longest, 3),
+            Badge("STREAK_7", "Một tuần bền bỉ", "Ghi nhận 7 ngày liên tiếp", "🏅", streak.Longest, 7),
+            Badge("STREAK_30", "Thói quen vàng", "Ghi nhận 30 ngày liên tiếp", "🏆", streak.Longest, 30),
+            Badge("ON_TARGET_7", "Cân bằng", "7 ngày đạt mục tiêu calo (90–110%)", "🎯", datChuan, 7),
+            Badge("PROTEIN_5", "Giàu đạm", "5 ngày ăn đủ lượng đạm mục tiêu", "💪", duDam, 5),
+            Badge("FIBER_5", "Bạn của chất xơ", "5 ngày đạt ≥ 25 g chất xơ", "🥦", duXo, 5),
+            Badge("FULL_DAY_3", "Đủ bữa", "3 ngày ăn đủ sáng, trưa, tối", "🍱", ngayDu3Bua, 3),
+            Badge("AI_10", "Cộng sự AI", "10 bữa ăn ghi nhận bằng AI", "🤖", buaAi, 10),
+        };
+
+        return new StreakDto(streak.Current, streak.Longest, rows.Any(r => r.Ngay == today), rows.Count, tongBua, badges);
     }
 
     private async Task<decimal> CurrentTargetAsync(Guid userId, CancellationToken ct)

@@ -1,8 +1,9 @@
 import { api, downloadFile } from "./client";
-import type { CalendarMonth, Dashboard, Report } from "@/types/api";
+import type { CalendarMonth, Dashboard, Report, Streak } from "@/types/api";
 
 export const dashboardApi = {
   get: () => api<Dashboard>("/api/dashboard"),
+  streak: () => api<Streak>("/api/dashboard/streak"),
   calendar: (nam: number, thang: number) => api<CalendarMonth>("/api/dashboard/calendar", { query: { nam, thang } }),
 };
 
