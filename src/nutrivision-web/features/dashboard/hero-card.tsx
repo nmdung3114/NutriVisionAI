@@ -1,44 +1,29 @@
 "use client";
 
-import { CalorieRing, STATE_META } from "@/components/shared/calorie-ring";
+import { STATE_META } from "@/components/shared/day-state";
+import { ActivityRings, RingLegend, type Ring } from "@/components/shared/activity-rings";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { MACRO_COLORS, fmt } from "@/lib/meal";
 import type { Dashboard } from "@/types/api";
 
-function MacroBar({ label, grams, target, share, color }: { label: string; grams: number; target: number; share: number; color: string }) {
-  const pct = target > 0 ? Math.min((grams / target) * 100, 100) : 0;
-  return (
-    <div>
-      <div className="mb-1.5 flex items-baseline justify-between text-sm">
-        <span className="font-semibold">{label}</span>
-        <span className="text-muted-foreground">
-          <b className="text-foreground">{fmt(grams, 1)}g</b> / {fmt(target)}g · {share}% năng lượng
-        </span>
-      </div>
-      <div
-        className="h-2.5 overflow-hidden rounded-full bg-muted"
-        role="progressbar"
-        aria-label={label}
-        aria-valuemin={0}
-        aria-valuemax={Math.round(target)}
-        aria-valuenow={Math.round(grams)}
-      >
-        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: color }} />
-      </div>
-    </div>
-  );
-}
-
 export function HeroCard({ data }: { data: Dashboard }) {
   const { homNay: h } = data;
   const meta = STATE_META[h.trangThai];
   const remain = data.mucTieuCalo - h.calo;
+  const rings: Ring[] = [
+    { key: "calo", label: "Calo", value: h.calo, target: data.mucTieuCalo, color: MACRO_COLORS.calo },
+    { key: "dam", label: "Chất đạm", value: h.chatDam, target: data.mucTieuMacro.chatDam, color: MACRO_COLORS.chatDam },
+    { key: "bot", label: "Tinh bột", value: h.tinhBot, target: data.mucTieuMacro.tinhBot, color: MACRO_COLORS.tinhBot },
+    { key: "beo", label: "Chất béo", value: h.chatBeo, target: data.mucTieuMacro.chatBeo, color: MACRO_COLORS.chatBeo },
+  ];
   return (
-    <section className="rounded-3xl border bg-card p-5 shadow-soft sm:p-7" aria-label="Tổng quan calo hôm nay">
-      <div className="grid items-center gap-6 md:grid-cols-[auto_1fr] md:gap-10">
+    <section className="relative overflow-hidden rounded-3xl border bg-card p-5 shadow-soft sm:p-7" aria-label="Tổng quan calo hôm nay">
+      <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-brand-500/10 blur-3xl" />
+      <div aria-hidden className="pointer-events-none absolute -bottom-24 left-40 size-64 rounded-full bg-yellow/15 blur-3xl" />
+      <div className="relative grid items-center gap-6 md:grid-cols-[auto_1fr] md:gap-10">
         <div className="flex flex-col items-center gap-3">
-          <CalorieRing value={h.calo} target={data.mucTieuCalo} state={h.trangThai} />
+          <ActivityRings rings={rings} center={{ value: h.calo, caption: `/ ${fmt(data.mucTieuCalo)} kcal` }} />
           <Badge className={cn("rounded-full px-3 py-1 text-xs font-bold", meta.bg)}>{meta.label}</Badge>
         </div>
         <div className="space-y-5">
@@ -51,16 +36,15 @@ export function HeroCard({ data }: { data: Dashboard }) {
                 </>
               ) : (
                 <>
-                  Đã vượt <b className="text-red-600">{fmt(-remain)} kcal</b> so với mục tiêu · {h.soBuaAn} bữa đã ghi nhận
+                  Đã vượt <b className="text-destructive">{fmt(-remain)} kcal</b> so với mục tiêu · {h.soBuaAn} bữa đã ghi nhận
                 </>
               )}
             </p>
           </div>
-          <div className="space-y-3.5">
-            <MacroBar label="Chất đạm" grams={h.chatDam} target={data.mucTieuMacro.chatDam} share={data.tyLeMacro.chatDam} color={MACRO_COLORS.chatDam} />
-            <MacroBar label="Tinh bột" grams={h.tinhBot} target={data.mucTieuMacro.tinhBot} share={data.tyLeMacro.tinhBot} color={MACRO_COLORS.tinhBot} />
-            <MacroBar label="Chất béo" grams={h.chatBeo} target={data.mucTieuMacro.chatBeo} share={data.tyLeMacro.chatBeo} color={MACRO_COLORS.chatBeo} />
-          </div>
+          <RingLegend rings={rings} />
+          <p className="text-xs text-muted-foreground">
+            Tỷ lệ năng lượng: đạm {data.tyLeMacro.chatDam}% · tinh bột {data.tyLeMacro.tinhBot}% · béo {data.tyLeMacro.chatBeo}% (khuyến nghị 20 / 50 / 30)
+          </p>
         </div>
       </div>
     </section>
