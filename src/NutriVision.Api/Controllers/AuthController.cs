@@ -1,95 +1,66 @@
-using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NutriVision.Api.Common;
-using NutriVision.Api.DTOs.Auth;
-using NutriVision.Api.Services.Interfaces;
+using Microsoft.AspNetCore.RateLimiting;
+using NutriVision.Application.Modules.Auth;
 
-namespace NutriVision.Api.Controllers
+namespace NutriVision.Api.Controllers;
+
+[Route("api/auth")]
+public class AuthController(IAuthService auth) : ApiControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    [HttpPost("register"), EnableRateLimiting("auth")]
+    public async Task<IActionResult> Register(RegisterRequest request, CancellationToken ct)
     {
-        private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
-        {
-            _authService = authService;
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            var result = await _authService.RegisterAsync(request);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        [HttpGet("verify-email")]
-        public async Task<IActionResult> VerifyEmail([FromQuery] string token)
-        {
-            var result = await _authService.VerifyEmailAsync(token);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            var result = await _authService.LoginAsync(request, ip);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
-        {
-            var result = await _authService.RefreshTokenAsync(request.RefreshToken);
-            if (!result.Success) return Unauthorized(result);
-            return Ok(result);
-        }
-
-        [Authorize]
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (Guid.TryParse(userIdStr, out var userId))
-            {
-                await _authService.LogoutAsync(userId);
-            }
-            return Ok(ApiResponse.Ok("Đăng xuất thành công!"));
-        }
-
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
-        {
-            var result = await _authService.ForgotPasswordAsync(request);
-            return Ok(result);
-        }
-
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
-        {
-            var result = await _authService.ResetPasswordAsync(request);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        [Authorize]
-        [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
-        {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdStr, out var userId)) return Unauthorized();
-
-            var result = await _authService.ChangePasswordAsync(userId, request);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
+        var r = await auth.RegisterAsync(request, ct);
+        return Success(r, r.EmailDaGui
+            ? "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản."
+            : "Đăng ký thành công nhưng chưa gửi được email xác thực. Hãy yêu cầu gửi lại.");
     }
+
+    [HttpPost("verify-email"), EnableRateLimiting("auth")]
+    public async Task<IActionResult> VerifyEmail(VerifyEmailRequest request, CancellationToken ct) =>
+        Success(await auth.VerifyEmailAsync(request.Token, ct), "Xác thực email thành công. Bạn có thể đăng nhập ngay.");
+
+    [HttpPost("resend-verification"), EnableRateLimiting("auth")]
+    public async Task<IActionResult> Resend(EmailRequest request, CancellationToken ct)
+    {
+        await auth.ResendVerificationAsync(request.Email, ct);
+        return Success("Nếu email hợp lệ và chưa xác thực, chúng tôi đã gửi lại liên kết xác thực.");
+    }
+
+    [HttpPost("login"), EnableRateLimiting("auth")]
+    public async Task<IActionResult> Login(LoginRequest request, CancellationToken ct) =>
+        Success(await auth.LoginAsync(request, ct), "Đăng nhập thành công.");
+
+    [HttpPost("refresh"), EnableRateLimiting("auth")]
+    public async Task<IActionResult> Refresh(RefreshRequest request, CancellationToken ct) =>
+        Success(await auth.RefreshAsync(request.RefreshToken, ct));
+
+    [HttpPost("logout"), Authorize]
+    public async Task<IActionResult> Logout(LogoutRequest request, CancellationToken ct)
+    {
+        await auth.LogoutAsync(request.RefreshToken, ct);
+        return Success("Đăng xuất thành công.");
+    }
+
+    [HttpPost("forgot-password"), EnableRateLimiting("auth")]
+    public async Task<IActionResult> Forgot(EmailRequest request, CancellationToken ct)
+    {
+        await auth.ForgotPasswordAsync(request.Email, ct);
+        return Success("Nếu email tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu.");
+    }
+
+    [HttpPost("reset-password"), EnableRateLimiting("auth")]
+    public async Task<IActionResult> Reset(ResetPasswordRequest request, CancellationToken ct)
+    {
+        await auth.ResetPasswordAsync(request, ct);
+        return Success("Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.");
+    }
+
+    [HttpPost("change-password"), Authorize]
+    public async Task<IActionResult> Change(ChangePasswordRequest request, CancellationToken ct) =>
+        Success(await auth.ChangePasswordAsync(request, ct), "Đổi mật khẩu thành công. Các thiết bị khác đã bị đăng xuất.");
+
+    [HttpGet("me"), Authorize]
+    public async Task<IActionResult> Me(CancellationToken ct) => Success(await auth.GetAccountAsync(ct));
 }
