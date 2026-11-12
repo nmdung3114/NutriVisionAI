@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { ServiceWorkerRegister } from "@/providers/sw-register";
 import { AuthProvider } from "@/providers/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -17,7 +18,8 @@ export const metadata: Metadata = {
   title: { default: "NutriVision AI – Theo dõi dinh dưỡng bằng AI", template: "%s | NutriVision AI" },
   description:
     "NutriVision AI giúp bạn nhận diện món ăn từ ảnh, tính calo và dinh dưỡng, theo dõi mục tiêu hằng ngày và báo cáo sức khỏe.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.svg", apple: "/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "NutriVision", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
@@ -38,6 +40,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <AuthProvider>
               <TooltipProvider delayDuration={150}>{children}</TooltipProvider>
               <Toaster position="top-center" richColors closeButton />
+              <ServiceWorkerRegister />
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
