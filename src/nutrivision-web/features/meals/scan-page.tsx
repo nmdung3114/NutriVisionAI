@@ -13,6 +13,7 @@ import { ApiError, errorHint, errorMessage } from "@/lib/api/errors";
 import { formatBytes, validateMealImage } from "@/lib/image";
 import { MEAL_THEME, MEAL_TYPES, isMealType, mealTypeByHour } from "@/lib/meal";
 import { QuickLog } from "./quick/quick-log";
+import { ScanOverlay, ScanSteps } from "./scan-overlay";
 import { cn } from "@/lib/utils";
 import type { LoaiBuaAn } from "@/types/api";
 import { CameraDialog } from "./camera-dialog";
@@ -37,6 +38,7 @@ export function ScanPage() {
   const [camera, setCamera] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [done, setDone] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const captureRef = useRef<HTMLInputElement>(null);
@@ -81,6 +83,7 @@ export function ScanPage() {
     try {
       const meal = await mealsApi.scan(picked.file, loai, undefined, ctrl.signal);
       setProgress(100);
+      setDone(true);
       void qc.invalidateQueries({ queryKey: ["meals"] });
       if (meal.aiThatBai) {
         try {
@@ -90,6 +93,7 @@ export function ScanPage() {
         }
         toast.warning("AI chưa nhận diện được món ăn – hãy nhập thủ công.");
       }
+      await new Promise((r) => setTimeout(r, 600)); // cho người dùng thấy dấu ✓ hoàn tất
       router.push(`/meals/review/${meal.id}`);
     } catch (e) {
       setScanning(false);
@@ -178,11 +182,7 @@ export function ScanPage() {
           <div className="relative bg-black/5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={picked.url} alt="Ảnh bữa ăn đã chọn" className="mx-auto max-h-[420px] w-full object-contain" />
-            {scanning && (
-              <div className="pointer-events-none absolute inset-0 bg-brand-500/10">
-                <div className="animate-scan-line absolute inset-x-0 h-[3px] bg-gradient-to-r from-transparent via-[#21b45a] to-transparent shadow-[0_0_24px_6px_rgba(33,180,90,0.7)]" />
-              </div>
-            )}
+            {scanning && <ScanOverlay done={done} />}
           </div>
           <div className="flex items-center justify-between gap-3 p-4">
             <div className="min-w-0">
@@ -202,18 +202,21 @@ export function ScanPage() {
         <div className="mt-4 rounded-2xl border bg-card p-4" role="status" aria-live="polite">
           <div className="mb-2 flex items-center justify-between text-sm">
             <span className="flex items-center gap-2 font-semibold">
-              <ScanLine className="size-4 text-primary" /> AI đang phân tích món ăn…
+              <ScanLine className="size-4 text-primary" /> {done ? "Hoàn tất! Đang mở kết quả…" : "AI đang phân tích món ăn…"}
             </span>
             <span className="font-bold text-primary">{Math.round(progress)}%</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
             <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
+          <ScanSteps done={done} />
           <div className="mt-3 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">Có thể mất đến vài chục giây, vui lòng không đóng trang.</p>
-            <Button type="button" variant="ghost" size="sm" onClick={() => abortRef.current?.abort()}>
-              <X /> Hủy
-            </Button>
+            {!done && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => abortRef.current?.abort()}>
+                <X /> Hủy
+              </Button>
+            )}
           </div>
         </div>
       )}
