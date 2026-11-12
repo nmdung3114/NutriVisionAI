@@ -96,7 +96,7 @@ export function UsersPage() {
       ) : error ? (
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : !data?.items.length ? (
-        <EmptyState title="Không tìm thấy người dùng" description="Hãy thử thay đổi từ khóa hoặc bộ lọc." />
+        <EmptyState illustration="search" title="Không tìm thấy người dùng" description="Hãy thử thay đổi từ khóa hoặc bộ lọc." />
       ) : (
         <div className={isFetching ? "opacity-70" : ""}>
           <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">

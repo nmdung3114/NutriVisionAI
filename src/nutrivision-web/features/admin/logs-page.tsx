@@ -54,7 +54,7 @@ export function LogsPage() {
       ) : error ? (
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : !data?.items.length ? (
-        <EmptyState title="Không có nhật ký phù hợp" description="Hãy thử nới rộng bộ lọc." />
+        <EmptyState illustration="search" title="Không có nhật ký phù hợp" description="Hãy thử nới rộng bộ lọc." />
       ) : (
         <div className={isFetching ? "opacity-70" : ""}>
           <div className="overflow-x-auto rounded-2xl border bg-card shadow-soft">

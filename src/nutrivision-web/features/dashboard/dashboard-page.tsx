@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Camera, PlusCircle, Sparkles, UserCog } from "lucide-react";
+import { Camera, PlusCircle, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/shared/page-header";
@@ -70,7 +70,7 @@ export function DashboardPage() {
 
       {!data.coDuLieu ? (
         <EmptyState
-          icon={<span className="flex size-20 items-center justify-center rounded-3xl bg-brand-50 text-primary"><Sparkles className="size-10" /></span>}
+          illustration="welcome"
           title="Chào mừng đến với NutriVision AI!"
           description="Bạn chưa ghi nhận bữa ăn nào. Chụp ảnh món ăn đầu tiên để AI giúp bạn tính calo và dinh dưỡng."
           action={

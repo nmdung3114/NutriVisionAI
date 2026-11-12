@@ -127,6 +127,7 @@ export function ReportsPage() {
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : !data || !hasData ? (
         <EmptyState
+          illustration="chart"
           title="Chưa có dữ liệu trong khoảng thời gian này"
           description="Hãy ghi nhận bữa ăn để xem báo cáo dinh dưỡng và nhận khuyến nghị."
           action={
