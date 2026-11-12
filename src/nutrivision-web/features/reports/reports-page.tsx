@@ -25,13 +25,13 @@ import type { Rating, Report, Trend } from "@/types/api";
 type Preset = "7" | "30" | "custom";
 
 const RATING: Record<Rating, { label: string; cls: string }> = {
-  Thap: { label: "Thấp", cls: "bg-yellow/30 text-[#8a5a00]" },
+  Thap: { label: "Thấp", cls: "bg-yellow/30 text-warn" },
   DatChuan: { label: "Đạt chuẩn", cls: "bg-brand-100 text-brand-700" },
-  Cao: { label: "Cao", cls: "bg-orange/20 text-[#a8341c]" },
+  Cao: { label: "Cao", cls: "bg-orange/20 text-danger-strong" },
 };
 const TREND: Record<Trend, { label: string; icon: typeof Minus; cls: string }> = {
-  Tang: { label: "Xu hướng tăng", icon: TrendingUp, cls: "bg-orange/20 text-[#a8341c]" },
-  Giam: { label: "Xu hướng giảm", icon: TrendingDown, cls: "bg-blue/15 text-[#2a6fc4]" },
+  Tang: { label: "Xu hướng tăng", icon: TrendingUp, cls: "bg-orange/20 text-danger-strong" },
+  Giam: { label: "Xu hướng giảm", icon: TrendingDown, cls: "bg-blue/15 text-info" },
   OnDinh: { label: "Ổn định", icon: Minus, cls: "bg-brand-100 text-brand-700" },
   KhongDuDuLieu: { label: "Chưa đủ dữ liệu xu hướng", icon: Minus, cls: "bg-muted text-muted-foreground" },
 };
@@ -42,7 +42,7 @@ function RatingBadge({ r }: { r: Rating }) {
 
 function Recommendations({ items }: { items: Report["khuyenNghi"] }) {
   const icon = { info: Info, warning: AlertTriangle, success: CheckCircle2 } as const;
-  const cls = { info: "bg-blue/10 text-[#2a6fc4]", warning: "bg-yellow/20 text-[#8a5a00]", success: "bg-brand-50 text-brand-700" } as const;
+  const cls = { info: "bg-blue/10 text-info", warning: "bg-yellow/20 text-warn", success: "bg-brand-50 text-brand-700" } as const;
   return (
     <section className="rounded-2xl border bg-card p-5 shadow-soft" aria-label="Khuyến nghị thông minh">
       <h2 className="mb-3 text-lg font-extrabold">Khuyến nghị thông minh</h2>

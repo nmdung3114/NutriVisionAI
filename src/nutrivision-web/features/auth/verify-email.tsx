@@ -80,7 +80,7 @@ export function VerifyEmail({ token }: { token: string }) {
       )}
       {state.kind === "expired" && (
         <>
-          {icon(Clock, "bg-yellow/25 text-[#9a6b00]")}
+          {icon(Clock, "bg-yellow/25 text-warn")}
           <h2 className="text-xl font-extrabold">Liên kết đã hết hạn</h2>
           <p className="text-sm text-muted-foreground">Nhập email để nhận liên kết xác thực mới.</p>
           <div className="rounded-xl border bg-muted/50 p-4 text-left">

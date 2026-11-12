@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 import { AuthProvider } from "@/providers/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -19,18 +20,27 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.svg" },
 };
 
-export const viewport: Viewport = { themeColor: "#21b45a", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#21b45a" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1411" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+};
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" className={jakarta.variable}>
+    <html lang="vi" className={jakarta.variable} suppressHydrationWarning>
       <body className="min-h-dvh bg-background font-sans">
-        <QueryProvider>
-          <AuthProvider>
-            <TooltipProvider delayDuration={150}>{children}</TooltipProvider>
-            <Toaster position="top-center" richColors closeButton />
-          </AuthProvider>
-        </QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <TooltipProvider delayDuration={150}>{children}</TooltipProvider>
+              <Toaster position="top-center" richColors closeButton />
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

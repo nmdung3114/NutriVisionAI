@@ -31,7 +31,7 @@ export function MacroDonut({
   unit?: string;
 }) {
   const total = slices.reduce((s, x) => s + x.value, 0);
-  const data = total > 0 ? slices : [{ name: "Chưa có", value: 1, color: "#e8efeb" }];
+  const data = total > 0 ? slices : [{ name: "Chưa có", value: 1, color: "var(--track)" }];
   return (
     <div className="relative w-full" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -54,7 +54,7 @@ export function MacroDonut({
           {total > 0 && (
             <Tooltip
               formatter={(v, n) => [`${Number(v).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}${unit}`, String(n)]}
-              contentStyle={{ borderRadius: 12, border: "1px solid #e3e9e6", fontSize: 12 }}
+              contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--popover)", color: "var(--popover-foreground)", fontSize: 12 }}
             />
           )}
         </PieChart>

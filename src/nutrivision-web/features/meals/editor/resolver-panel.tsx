@@ -66,7 +66,7 @@ export function ResolverPanel({
 
   return (
     <div className="mt-3 rounded-xl border border-orange/40 bg-orange/10 p-3 text-sm" role="group" aria-label={`Bổ sung dữ liệu dinh dưỡng cho ${name}`}>
-      <p className="flex items-start gap-2 font-semibold text-[#a8341c]">
+      <p className="flex items-start gap-2 font-semibold text-danger-strong">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" />
         Chưa có dữ liệu dinh dưỡng cho &quot;{name || "thành phần này"}&quot;
       </p>

@@ -52,7 +52,7 @@ interface Props {
 
 function ConfidenceBadge({ value }: { value: number | null }) {
   if (value === null) return null;
-  const tone = value >= 80 ? "bg-brand-100 text-brand-700" : value >= 50 ? "bg-yellow/30 text-[#8a5a00]" : "bg-orange/20 text-[#a8341c]";
+  const tone = value >= 80 ? "bg-brand-100 text-brand-700" : value >= 50 ? "bg-yellow/30 text-warn" : "bg-orange/20 text-danger-strong";
   return (
     <Badge className={cn("gap-1 rounded-full px-2.5 py-1 text-xs font-bold", tone)} title="Độ tin cậy của AI">
       <Sparkles className="size-3.5" /> AI tin cậy {value}%
@@ -250,10 +250,10 @@ export function MealEditor({ mode, meal, initialLoai = "Trua", failedNotice, onE
     <div className="space-y-5">
       {aiFailed && (
         <div className="flex gap-3 rounded-2xl border border-orange/50 bg-orange/10 p-4" role="alert">
-          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-[#d4472b]" />
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-danger-strong" />
           <div className="text-sm">
-            <p className="font-bold text-[#a8341c]">AI chưa nhận diện được món ăn trong ảnh</p>
-            <p className="text-[#a8341c]/90">{failedNotice || "Bạn hãy nhập tên món và các thành phần thủ công. Ảnh đã tải lên vẫn được giữ cho bữa ăn này."}</p>
+            <p className="font-bold text-danger-strong">AI chưa nhận diện được món ăn trong ảnh</p>
+            <p className="text-danger-strong/90">{failedNotice || "Bạn hãy nhập tên món và các thành phần thủ công. Ảnh đã tải lên vẫn được giữ cho bữa ăn này."}</p>
           </div>
         </div>
       )}

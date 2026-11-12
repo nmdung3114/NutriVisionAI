@@ -67,7 +67,7 @@ export function AvatarCard({ profile }: { profile: Profile }) {
         <p className="mt-1 text-xs text-muted-foreground">JPG, PNG hoặc WEBP, tối đa 5MB.</p>
         {file && <p className="mt-1 text-xs font-medium">{file.name} · {formatBytes(file.size)}</p>}
         {!profile.daDayDu && !error && (
-          <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-[#8a5a00] sm:justify-start">
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-warn sm:justify-start">
             <Info className="size-3.5" /> Hãy lưu hồ sơ trước khi đổi ảnh đại diện.
           </p>
         )}

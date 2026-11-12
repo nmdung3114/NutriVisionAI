@@ -6,14 +6,15 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Camera, CheckCircle2, FileDown, LineChart, Sparkles, Target, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { FullPageLoader } from "@/components/layout/app-shell";
 import { useAuth } from "@/providers/auth-provider";
 
 const FEATURES = [
   { icon: Camera, title: "Nhận diện bằng AI", text: "Chụp ảnh món ăn, AI tách thành phần và ước tính khẩu phần trong vài giây.", tone: "bg-brand-50 text-brand-700" },
-  { icon: Target, title: "Mục tiêu cá nhân hóa", text: "Tự động tính BMI, BMR, TDEE và mục tiêu calo phù hợp với thể trạng của bạn.", tone: "bg-orange/15 text-[#d4472b]" },
-  { icon: LineChart, title: "Báo cáo trực quan", text: "Theo dõi calo, đạm, tinh bột, béo theo ngày, tuần, tháng cùng khuyến nghị thông minh.", tone: "bg-blue/15 text-[#2a6fc4]" },
-  { icon: FileDown, title: "Xuất PDF / CSV", text: "Tải báo cáo dinh dưỡng của bạn để lưu trữ hoặc chia sẻ với chuyên gia.", tone: "bg-purple/15 text-[#6f3fc4]" },
+  { icon: Target, title: "Mục tiêu cá nhân hóa", text: "Tự động tính BMI, BMR, TDEE và mục tiêu calo phù hợp với thể trạng của bạn.", tone: "bg-orange/15 text-danger-strong" },
+  { icon: LineChart, title: "Báo cáo trực quan", text: "Theo dõi calo, đạm, tinh bột, béo theo ngày, tuần, tháng cùng khuyến nghị thông minh.", tone: "bg-blue/15 text-info" },
+  { icon: FileDown, title: "Xuất PDF / CSV", text: "Tải báo cáo dinh dưỡng của bạn để lưu trữ hoặc chia sẻ với chuyên gia.", tone: "bg-purple/15 text-violet" },
 ];
 
 const STEPS = [
@@ -37,6 +38,7 @@ export function Landing() {
         <nav className="flex items-center gap-2" aria-label="Tài khoản">
           <Button asChild variant="ghost"><Link href="/login">Đăng nhập</Link></Button>
           <Button asChild className="font-bold"><Link href="/register">Đăng ký</Link></Button>
+          <ThemeToggle />
         </nav>
       </header>
 
@@ -70,7 +72,7 @@ export function Landing() {
                 <div className="flex items-center gap-5">
                   <div className="relative size-32 shrink-0">
                     <svg viewBox="0 0 120 120" className="-rotate-90">
-                      <circle cx="60" cy="60" r="50" fill="none" stroke="#e8efeb" strokeWidth="12" />
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="var(--track)" strokeWidth="12" />
                       <circle cx="60" cy="60" r="50" fill="none" stroke="#21b45a" strokeWidth="12" strokeLinecap="round" strokeDasharray="314" strokeDashoffset="90" />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center"><b className="text-2xl">1.420</b><span className="text-[11px] text-muted-foreground">/ 2.000 kcal</span></div>
@@ -85,12 +87,12 @@ export function Landing() {
                   </div>
                 </div>
                 <div className="mt-5 flex items-center gap-3 rounded-2xl bg-brand-50 p-3">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-white text-2xl">🍜</span>
+                  <span className="flex size-11 items-center justify-center rounded-xl bg-card text-2xl">🍜</span>
                   <div className="flex-1"><p className="text-sm font-bold">Phở bò tái</p><p className="text-xs text-muted-foreground">AI tin cậy 92%</p></div>
                   <b className="text-primary">450 kcal</b>
                 </div>
               </div>
-              <span className="absolute -left-4 -top-4 flex items-center gap-1.5 rounded-full bg-yellow px-3 py-1.5 text-xs font-bold shadow-md"><Zap className="size-3.5" /> Nhận diện 5 giây</span>
+              <span className="absolute -left-4 -top-4 flex items-center gap-1.5 rounded-full bg-yellow px-3 py-1.5 text-xs font-bold text-[#3b2a00] shadow-md"><Zap className="size-3.5" /> Nhận diện 5 giây</span>
             </div>
           </div>
         </section>
@@ -125,7 +127,7 @@ export function Landing() {
           <div className="rounded-3xl bg-gradient-to-br from-[#1fb857] to-[#0f7a3b] p-8 text-center text-white sm:p-12">
             <h2 className="text-3xl font-extrabold">Sẵn sàng bắt đầu hành trình khỏe mạnh?</h2>
             <p className="mx-auto mt-2 max-w-xl text-white/85">Đăng ký chỉ mất một phút. Bữa ăn đầu tiên của bạn đang chờ được ghi nhận.</p>
-            <Button asChild size="lg" className="mt-6 bg-white font-bold text-brand-700 hover:bg-white/90"><Link href="/register">Tạo tài khoản miễn phí</Link></Button>
+            <Button asChild size="lg" className="mt-6 bg-white font-bold text-[#168d47] hover:bg-white/90"><Link href="/register">Tạo tài khoản miễn phí</Link></Button>
           </div>
         </section>
       </main>

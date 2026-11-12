@@ -26,7 +26,7 @@ import { Pagination } from "./pagination";
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   ACTIVE: { label: "Hoạt động", cls: "bg-brand-100 text-brand-700" },
-  PENDING: { label: "Chờ xác thực", cls: "bg-yellow/30 text-[#8a5a00]" },
+  PENDING: { label: "Chờ xác thực", cls: "bg-yellow/30 text-warn" },
   LOCKED: { label: "Đã khóa", cls: "bg-red-100 text-red-700" },
 };
 

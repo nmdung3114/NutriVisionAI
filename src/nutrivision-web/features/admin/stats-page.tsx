@@ -15,10 +15,10 @@ function CountChart({ title, data, color, kind }: { title: string; data: DayCoun
   const rows = data.map((d) => ({ ...d, label: formatDayMonth(d.ngay) }));
   const common = (
     <>
-      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8efeb" />
+      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--track)" />
       <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} minTickGap={20} />
       <YAxis tickLine={false} axisLine={false} fontSize={11} width={32} allowDecimals={false} />
-      <Tooltip formatter={(v) => [String(v), title]} contentStyle={{ borderRadius: 12, border: "1px solid #e3e9e6", fontSize: 12 }} />
+      <Tooltip formatter={(v) => [String(v), title]} contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--popover)", color: "var(--popover-foreground)", fontSize: 12 }} />
     </>
   );
   return (

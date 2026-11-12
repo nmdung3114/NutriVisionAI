@@ -39,15 +39,20 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-brand-50: #effaf3;
-  --color-brand-100: #d6f3e1;
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
   --color-brand-500: #21b45a;
   --color-brand-600: #1a9a4c;
-  --color-brand-700: #168d47;
+  --color-brand-700: var(--brand-700);
   --color-orange: #ff795e;
   --color-yellow: #ffc934;
   --color-blue: #4b9cf5;
   --color-purple: #9d68ed;
+  --color-warn: var(--warn);
+  --color-danger-strong: var(--danger-strong);
+  --color-info: var(--info);
+  --color-violet: var(--violet);
+  --color-track: var(--track);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -91,6 +96,59 @@
   --sidebar-accent-foreground: #146b37;
   --sidebar-border: #e3e9e6;
   --sidebar-ring: #21b45a;
+  /* Màu chữ ngữ nghĩa đủ tương phản (WCAG AA) trên nền sáng */
+  --warn: #8a5a00;
+  --danger-strong: #a8341c;
+  --info: #2a6fc4;
+  --violet: #6f3fc4;
+  /* Rãnh vòng tiến độ, lưới biểu đồ */
+  --track: #e8efeb;
+  --brand-50: #effaf3;
+  --brand-100: #d6f3e1;
+  --brand-700: #168d47;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0d1411;
+  --foreground: #e6efe9;
+  --card: #151f1a;
+  --card-foreground: #e6efe9;
+  --popover: #18231d;
+  --popover-foreground: #e6efe9;
+  --primary: #2ec46a;
+  --primary-foreground: #06240f;
+  --secondary: #17321f;
+  --secondary-foreground: #9de5b8;
+  --muted: #1c2822;
+  --muted-foreground: #93a59c;
+  --accent: #1b3324;
+  --accent-foreground: #a9eac2;
+  --destructive: #f26266;
+  --border: #25332c;
+  --input: #2d3d35;
+  --ring: #2ec46a;
+  --chart-1: #2ec46a;
+  --chart-2: #ff8a73;
+  --chart-3: #ffd257;
+  --chart-4: #6aafff;
+  --chart-5: #b08cf5;
+  --sidebar: #111a15;
+  --sidebar-foreground: #e6efe9;
+  --sidebar-primary: #2ec46a;
+  --sidebar-primary-foreground: #06240f;
+  --sidebar-accent: #1b3324;
+  --sidebar-accent-foreground: #a9eac2;
+  --sidebar-border: #25332c;
+  --sidebar-ring: #2ec46a;
+  --warn: #f5c451;
+  --danger-strong: #ff8f78;
+  --info: #7cb8ff;
+  --violet: #c2a2ff;
+  --track: #24332b;
+  --brand-50: #14291c;
+  --brand-100: #1b3a26;
+  --brand-700: #8fe3b0;
 }
 
 @layer base {
@@ -108,6 +166,9 @@
 @layer utilities {
   .shadow-soft {
     box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -8px rgba(16, 24, 40, 0.08);
+  }
+  .dark .shadow-soft {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
   }
 }
 

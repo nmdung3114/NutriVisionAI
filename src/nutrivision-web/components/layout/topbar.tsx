@@ -10,6 +10,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { greetingByHour } from "@/lib/date";
 import { SidebarContent } from "./sidebar";
 import { UserAvatar } from "./user-avatar";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export function Topbar() {
   const { user, logout } = useAuth();
@@ -40,6 +41,8 @@ export function Topbar() {
         <p className="truncate text-sm text-muted-foreground">{greeting},</p>
         <p className="truncate text-base font-extrabold leading-tight">{firstName} 👋</p>
       </div>
+
+      <ThemeToggle />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

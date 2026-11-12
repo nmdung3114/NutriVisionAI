@@ -50,14 +50,14 @@ export function DashboardPage() {
 
       {!data.hoSoDayDu && (
         <div className="flex flex-col gap-3 rounded-2xl border border-yellow/60 bg-yellow/15 p-4 sm:flex-row sm:items-center" role="note">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-yellow/40 text-[#8a5a00]">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-yellow/40 text-warn">
             <UserCog className="size-5" />
           </span>
           <div className="flex-1">
             <p className="font-bold">Hoàn thiện hồ sơ để có mục tiêu calo chính xác</p>
             <p className="text-sm text-muted-foreground">Bạn đang dùng mục tiêu mặc định. Nhập chiều cao, cân nặng, mức độ vận động để tính TDEE cá nhân.</p>
           </div>
-          <Button asChild variant="outline" className="border-yellow bg-white">
+          <Button asChild variant="outline" className="border-yellow bg-card">
             <Link href="/profile">Cập nhật hồ sơ</Link>
           </Button>
         </div>

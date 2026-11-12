@@ -20,7 +20,7 @@ export function CalorieBarChart({ data, height = 260 }: { data: DayPoint[]; heig
     <div style={{ height }} className="w-full" role="img" aria-label="Biểu đồ calo theo ngày so với mục tiêu">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={rows} margin={{ top: 12, right: 8, left: -12, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8efeb" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--track)" />
           <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} interval={sparse ? "preserveStartEnd" : 0} minTickGap={sparse ? 16 : 0} />
           <YAxis tickLine={false} axisLine={false} fontSize={12} width={48} />
           <Tooltip

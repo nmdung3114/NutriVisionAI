@@ -2,10 +2,10 @@ import { cn } from "@/lib/utils";
 
 const TONES = {
   green: "bg-brand-50 text-brand-700",
-  orange: "bg-orange/15 text-[#d4472b]",
-  yellow: "bg-yellow/25 text-[#9a6b00]",
-  blue: "bg-blue/15 text-[#2a6fc4]",
-  purple: "bg-purple/15 text-[#6f3fc4]",
+  orange: "bg-orange/15 text-danger-strong",
+  yellow: "bg-yellow/25 text-warn",
+  blue: "bg-blue/15 text-info",
+  purple: "bg-purple/15 text-violet",
   gray: "bg-muted text-muted-foreground",
 } as const;
 
