@@ -327,3 +327,21 @@ export interface Streak {
   tongBuaAn: number;
   huyHieu: Badge[];
 }
+
+export type InsightKind = "CanhBao" | "ThongTin" | "TichCuc";
+
+export interface Insight {
+  ma: string;
+  loai: InsightKind;
+  tieuDe: string;
+  noiDung: string;
+  bieuTuong: string;
+}
+
+export interface WeeklyInsights {
+  tuNgay: string;
+  denNgay: string;
+  soNgayCoDuLieu: number;
+  caloTrungBinh: number;
+  nhanXet: Insight[];
+}

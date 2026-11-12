@@ -21,6 +21,10 @@ public class DashboardController(IDashboardService dashboard, IHabitService habi
     /// <summary>Chuỗi ngày ghi nhận liên tiếp và huy hiệu.</summary>
     [HttpGet("streak")]
     public async Task<IActionResult> Streak(CancellationToken ct) => Success(await habits.GetStreakAsync(ct));
+
+    /// <summary>Nhận xét tự động 7 ngày gần nhất.</summary>
+    [HttpGet("insights")]
+    public async Task<IActionResult> Insights(CancellationToken ct) => Success(await habits.GetWeeklyInsightsAsync(ct));
 }
 
 [Route("api/suggestions"), Authorize]

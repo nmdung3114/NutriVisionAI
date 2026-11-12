@@ -15,6 +15,7 @@ import { TodayMeals } from "./today-meals";
 import { Suggestions } from "./suggestions";
 import { MonthHeatmap } from "./month-heatmap";
 import { StreakCard } from "./streak-card";
+import { WeeklyInsights } from "./weekly-insights";
 
 function DashboardSkeleton() {
   return (
@@ -82,6 +83,7 @@ export function DashboardPage() {
         <>
           <HeroCard data={data} />
           <TodayMeals data={data} />
+          <WeeklyInsights />
         </>
       )}
 

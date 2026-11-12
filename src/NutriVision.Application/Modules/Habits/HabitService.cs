@@ -15,8 +15,13 @@ public record BadgeDto(string Ma, string Ten, string MoTa, string BieuTuong, boo
 
 public record StreakDto(int ChuoiHienTai, int ChuoiDaiNhat, bool HomNayDaGhi, int TongNgayGhiNhan, int TongBuaAn, IReadOnlyList<BadgeDto> HuyHieu);
 
+public record WeeklyInsightsDto(DateOnly TuNgay, DateOnly DenNgay, int SoNgayCoDuLieu, decimal CaloTrungBinh, IReadOnlyList<InsightDto> NhanXet);
+
 public interface IHabitService
 {
+    /// <summary>Nhận xét tự động cho 7 ngày gần nhất (so với mục tiêu và tuần trước).</summary>
+    Task<WeeklyInsightsDto> GetWeeklyInsightsAsync(CancellationToken ct = default);
+
     /// <summary>Chuỗi ngày ghi nhận liên tiếp và huy hiệu (tính từ dữ liệu bữa ăn đã xác nhận, không lưu thêm bảng).</summary>
     Task<StreakDto> GetStreakAsync(CancellationToken ct = default);
 
@@ -104,6 +109,32 @@ public class HabitService(IApplicationDbContext db, ICurrentUser currentUser, Ap
         };
 
         return new StreakDto(streak.Current, streak.Longest, rows.Any(r => r.Ngay == today), rows.Count, tongBua, badges);
+    }
+
+    public async Task<WeeklyInsightsDto> GetWeeklyInsightsAsync(CancellationToken ct = default)
+    {
+        var userId = currentUser.RequireUserId();
+        var today = clock.Today;
+        var from = today.AddDays(-6);
+        var prevFrom = from.AddDays(-7);
+        var target = await CurrentTargetAsync(userId, ct);
+
+        var rows = await db.TongHopDinhDuongNgays.AsNoTracking()
+            .Where(t => t.NguoiDungId == userId && t.SoBuaAnDaGhi > 0 && t.Ngay >= prevFrom && t.Ngay <= today).ToListAsync(ct);
+        var meals = await db.BuaAns.AsNoTracking()
+            .Where(b => b.NguoiDungId == userId && b.DaXacNhan && !b.DaXoa && b.NgayAn >= from && b.NgayAn <= today)
+            .Select(b => new { b.NgayAn, b.LoaiBuaAn, b.TongCalo }).ToListAsync(ct);
+        var byDayType = meals.GroupBy(m => m.NgayAn)
+            .ToDictionary(g => g.Key, g => (IReadOnlyDictionary<string, decimal>)g.GroupBy(m => m.LoaiBuaAn).ToDictionary(x => x.Key, x => x.Sum(m => m.TongCalo)));
+        var empty = new Dictionary<string, decimal>();
+
+        InsightDay ToDay(Domain.Entities.TongHopDinhDuongNgay r) =>
+            new(r.Ngay, r.Tong, r.MucTieuCaloNgay > 0 ? r.MucTieuCaloNgay : target, byDayType.GetValueOrDefault(r.Ngay) ?? empty);
+
+        var week = rows.Where(r => r.Ngay >= from).OrderBy(r => r.Ngay).Select(ToDay).ToList();
+        var prev = rows.Where(r => r.Ngay < from).OrderBy(r => r.Ngay).Select(ToDay).ToList();
+        var avg = week.Count == 0 ? 0 : Math.Round(week.Average(d => d.Tong.Calo), 0);
+        return new WeeklyInsightsDto(from, today, week.Count, avg, WeeklyInsightRules.Build(week, prev));
     }
 
     private async Task<decimal> CurrentTargetAsync(Guid userId, CancellationToken ct)

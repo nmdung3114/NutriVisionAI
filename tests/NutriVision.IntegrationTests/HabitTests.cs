@@ -88,4 +88,30 @@ public class HabitTests(ApiFactory f) : IntegrationTestBase(f)
         Assert.Equal(3, after.GetProperty("chuoiHienTai").GetInt32());
         Assert.True(after.GetProperty("huyHieu").EnumerateArray().Single(b => b.GetProperty("ma").GetString() == "STREAK_3").GetProperty("datDuoc").GetBoolean());
     }
+
+    [Fact]
+    public async Task Weekly_Insights_Use_Last_Seven_Days()
+    {
+        var (c, _) = await NewVerifiedUser(); // 2000 kcal
+        Assert.Equal("NO_DATA", (await c.Get("/api/dashboard/insights")).Data.GetProperty("nhanXet")[0].GetProperty("ma").GetString());
+
+        var today = Today;
+        for (var i = 0; i < 3; i++)
+        {
+            await LogMeal(c, today.AddDays(-i), "Trua", 600, dam: 20, bot: 60, beo: 30, xo: 3);
+            await LogMeal(c, today.AddDays(-i), "Toi", 1400, dam: 40, bot: 120, beo: 70, xo: 3);
+        }
+        await LogMeal(c, today.AddDays(-20), "Sang", 3000); // ngoài cửa sổ 14 ngày → bị bỏ qua
+
+        var r = (await c.Get("/api/dashboard/insights")).Data;
+        Assert.Equal(3, r.GetProperty("soNgayCoDuLieu").GetInt32());
+        Assert.Equal(2000m, r.GetProperty("caloTrungBinh").GetDecimal());
+        var codes = r.GetProperty("nhanXet").EnumerateArray().Select(x => x.GetProperty("ma").GetString()).ToHashSet();
+        Assert.Contains("CALO_OK", codes);
+        Assert.Contains("FIBER_LOW", codes);
+        Assert.Contains("DINNER_HEAVY", codes);   // 1400/2000 = 70%
+        Assert.Contains("NO_BREAKFAST", codes);
+        Assert.Contains("FAT_HIGH", codes);       // 100 g béo × 9 / 2000 ≈ 45%
+        Assert.DoesNotContain("TREND", codes);
+    }
 }
