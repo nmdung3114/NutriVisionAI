@@ -18,6 +18,7 @@ import { StreakCard } from "./streak-card";
 import { WeeklyInsights } from "./weekly-insights";
 import { QuickLog } from "@/features/meals/quick/quick-log";
 import { WaterCard } from "@/features/tracking/water-card";
+import { ShareDayDialog } from "./share-day-dialog";
 
 function DashboardSkeleton() {
   return (
@@ -45,11 +46,14 @@ export function DashboardPage() {
         title="Tổng quan hôm nay"
         description={`Ngày ${formatDate(data.ngay)} · Mục tiêu ${data.mucTieuCalo.toLocaleString("vi-VN")} kcal`}
         actions={
-          <Button asChild className="font-bold">
-            <Link href="/meals/new">
-              <PlusCircle /> Thêm bữa ăn
-            </Link>
-          </Button>
+          <>
+            {data.coDuLieu && <ShareDayDialog data={data} />}
+            <Button asChild className="font-bold">
+              <Link href="/meals/new">
+                <PlusCircle /> Thêm bữa ăn
+              </Link>
+            </Button>
+          </>
         }
       />
 
