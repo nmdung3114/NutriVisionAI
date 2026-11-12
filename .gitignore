@@ -102,3 +102,7 @@ $RECYCLE.BIN/
 *.swp
 *~
 
+
+# NutriVision runtime data (uploads, outbox email dev, SQLite dev DB, logs)
+src/NutriVision.Api/App_Data/
+src/NutriVision.Api/logs/

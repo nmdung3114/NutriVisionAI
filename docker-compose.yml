@@ -1,0 +1,14 @@
+# SQL Server cho môi trường chạy thật (provider mặc định trong appsettings.json).
+# Chạy: docker compose up -d  → rồi đặt ConnectionString tương ứng (xem README.md).
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "NutriVision@2026"
+    ports:
+      - "1433:1433"
+    volumes:
+      - nutrivision-sql:/var/opt/mssql
+volumes:
+  nutrivision-sql:
