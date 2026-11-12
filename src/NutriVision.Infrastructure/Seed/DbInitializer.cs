@@ -24,7 +24,11 @@ public static class DbInitializer
 
         if (settings.AutoMigrate)
         {
-            if (db.Database.IsSqlite()) await db.Database.EnsureCreatedAsync(ct);
+            if (db.Database.IsSqlite())
+            {
+                // CSDL mới → tạo toàn bộ; CSDL đã có → chỉ bổ sung bảng mới, giữ nguyên dữ liệu.
+                if (!await db.Database.EnsureCreatedAsync(ct)) await SqliteSchemaUpgrader.CreateMissingTablesAsync(db, logger, ct);
+            }
             else await db.Database.MigrateAsync(ct);
         }
 
