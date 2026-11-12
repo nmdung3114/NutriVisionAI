@@ -11,6 +11,7 @@ using NutriVision.Application.Modules.Meals;
 using NutriVision.Application.Modules.Profile;
 using NutriVision.Application.Modules.Reports;
 using NutriVision.Application.Modules.Suggestions;
+using NutriVision.Application.Modules.Tracking;
 
 namespace NutriVision.Application;
 
@@ -36,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IHabitService, HabitService>();
+        services.AddScoped<IWeightService, WeightService>();
         services.AddScoped<ISuggestionService, SuggestionService>();
         services.AddScoped<IAdminService, AdminService>();
         return services;

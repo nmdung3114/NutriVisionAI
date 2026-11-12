@@ -170,3 +170,16 @@ public class NhatKyHeThongConfiguration : IEntityTypeConfiguration<NhatKyHeThong
         b.HasOne(x => x.NguoiDungThucHien).WithMany().HasForeignKey(x => x.NguoiDungThucHienId).OnDelete(DeleteBehavior.SetNull);
     }
 }
+
+public class NhatKyCanNangConfiguration : IEntityTypeConfiguration<NhatKyCanNang>
+{
+    public void Configure(EntityTypeBuilder<NhatKyCanNang> b)
+    {
+        b.ToTable("NhatKyCanNang");
+        b.HasKey(x => x.Id);
+        b.Property(x => x.CanNang).HasPrecision(5, 2);
+        b.Property(x => x.GhiChu).HasMaxLength(200);
+        b.HasIndex(x => new { x.NguoiDungId, x.Ngay }).IsUnique();
+        b.HasOne(x => x.NguoiDung).WithMany().HasForeignKey(x => x.NguoiDungId).OnDelete(DeleteBehavior.Cascade);
+    }
+}

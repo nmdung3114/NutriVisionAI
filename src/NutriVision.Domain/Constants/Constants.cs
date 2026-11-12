@@ -72,6 +72,7 @@ public static class HanhDong
     public const string DatLaiMatKhau = "DAT_LAI_MAT_KHAU";
     public const string DoiMatKhau = "DOI_MAT_KHAU";
     public const string CapNhatHoSo = "CAP_NHAT_HO_SO";
+    public const string GhiCanNang = "GHI_CAN_NANG";
     public const string XacNhanBuaAn = "XAC_NHAN_BUA_AN";
     public const string SuaBuaAn = "SUA_BUA_AN";
     public const string XoaBuaAn = "XOA_BUA_AN";

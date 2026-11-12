@@ -366,7 +366,51 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20261112053122_InitialCreate', N'8.0.11');
+    VALUES (N'20261112053122_InitialCreate', N'8.0.34');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261112090413_ThemNhatKyCanNang'
+)
+BEGIN
+    CREATE TABLE [NhatKyCanNang] (
+        [Id] uniqueidentifier NOT NULL,
+        [NguoiDungId] uniqueidentifier NOT NULL,
+        [Ngay] date NOT NULL,
+        [CanNang] decimal(5,2) NOT NULL,
+        [GhiChu] nvarchar(200) NULL,
+        [NgayTao] datetimeoffset NOT NULL,
+        [NgayCapNhat] datetimeoffset NOT NULL,
+        CONSTRAINT [PK_NhatKyCanNang] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_NhatKyCanNang_NguoiDung_NguoiDungId] FOREIGN KEY ([NguoiDungId]) REFERENCES [NguoiDung] ([Id]) ON DELETE CASCADE
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261112090413_ThemNhatKyCanNang'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_NhatKyCanNang_NguoiDungId_Ngay] ON [NhatKyCanNang] ([NguoiDungId], [Ngay]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261112090413_ThemNhatKyCanNang'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261112090413_ThemNhatKyCanNang', N'8.0.34');
 END;
 GO
 

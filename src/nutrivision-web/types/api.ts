@@ -355,3 +355,21 @@ export interface FrequentMeal {
   lanCuoi: string;
   hinhAnhUrl: string | null;
 }
+
+export interface WeightEntry {
+  id: string;
+  ngay: string;
+  canNang: number;
+  ghiChu: string | null;
+}
+
+export interface WeightOverview {
+  hienTai: number | null;
+  banDau: number | null;
+  thayDoi7Ngay: number | null;
+  thayDoi30Ngay: number | null;
+  chieuCao: number | null;
+  bmi: number | null;
+  phanLoaiBmi: string | null;
+  danhSach: WeightEntry[];
+}

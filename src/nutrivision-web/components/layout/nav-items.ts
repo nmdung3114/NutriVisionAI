@@ -1,4 +1,4 @@
-import { BarChart3, ClipboardList, LayoutDashboard, PlusCircle, ShieldCheck, ScrollText, UserCircle, Users, type LucideIcon } from "lucide-react";
+import { Activity, BarChart3, ClipboardList, LayoutDashboard, PlusCircle, ShieldCheck, ScrollText, UserCircle, Users, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -13,6 +13,7 @@ export const USER_NAV: NavItem[] = [
   { href: "/meals/new", label: "Thêm bữa ăn", icon: PlusCircle },
   { href: "/meals", label: "Lịch sử", icon: ClipboardList, exact: true },
   { href: "/reports", label: "Báo cáo", icon: BarChart3 },
+  { href: "/tracking", label: "Cân nặng & nước", icon: Activity },
   { href: "/profile", label: "Hồ sơ", icon: UserCircle },
 ];
 

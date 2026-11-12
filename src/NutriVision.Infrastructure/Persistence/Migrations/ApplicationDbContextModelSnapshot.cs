@@ -17,7 +17,7 @@ namespace NutriVision.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.34")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -275,6 +275,40 @@ namespace NutriVision.Infrastructure.Persistence.Migrations
                     b.HasIndex("TokenXacThucEmail");
 
                     b.ToTable("NguoiDung", (string)null);
+                });
+
+            modelBuilder.Entity("NutriVision.Domain.Entities.NhatKyCanNang", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("CanNang")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("GhiChu")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateOnly>("Ngay")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("NgayCapNhat")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("NgayTao")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("NguoiDungId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NguoiDungId", "Ngay")
+                        .IsUnique();
+
+                    b.ToTable("NhatKyCanNang", (string)null);
                 });
 
             modelBuilder.Entity("NutriVision.Domain.Entities.NhatKyHeThong", b =>
@@ -560,6 +594,17 @@ namespace NutriVision.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("BuaAn");
+
+                    b.Navigation("NguoiDung");
+                });
+
+            modelBuilder.Entity("NutriVision.Domain.Entities.NhatKyCanNang", b =>
+                {
+                    b.HasOne("NutriVision.Domain.Entities.NguoiDung", "NguoiDung")
+                        .WithMany()
+                        .HasForeignKey("NguoiDungId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("NguoiDung");
                 });
