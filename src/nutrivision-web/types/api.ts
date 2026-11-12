@@ -373,3 +373,12 @@ export interface WeightOverview {
   phanLoaiBmi: string | null;
   danhSach: WeightEntry[];
 }
+
+export interface WaterSummary {
+  ngay: string;
+  luongMl: number;
+  mucTieuMl: number;
+  phanTram: number;
+  soNgayDatMucTieu7Ngay: number;
+  bayNgay: { ngay: string; luongMl: number }[];
+}

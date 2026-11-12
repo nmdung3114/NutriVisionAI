@@ -16,6 +16,7 @@ public interface IApplicationDbContext
     DbSet<LichSuNhanDienAI> LichSuNhanDienAIs { get; }
     DbSet<NhatKyHeThong> NhatKyHeThongs { get; }
     DbSet<NhatKyCanNang> NhatKyCanNangs { get; }
+    DbSet<NhatKyNuocUong> NhatKyNuocUongs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 

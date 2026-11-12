@@ -183,3 +183,14 @@ public class NhatKyCanNangConfiguration : IEntityTypeConfiguration<NhatKyCanNang
         b.HasOne(x => x.NguoiDung).WithMany().HasForeignKey(x => x.NguoiDungId).OnDelete(DeleteBehavior.Cascade);
     }
 }
+
+public class NhatKyNuocUongConfiguration : IEntityTypeConfiguration<NhatKyNuocUong>
+{
+    public void Configure(EntityTypeBuilder<NhatKyNuocUong> b)
+    {
+        b.ToTable("NhatKyNuocUong", t => t.HasCheckConstraint("CK_NhatKyNuocUong_LuongMl", "[LuongMl] >= 0 AND [LuongMl] <= 10000"));
+        b.HasKey(x => x.Id);
+        b.HasIndex(x => new { x.NguoiDungId, x.Ngay }).IsUnique();
+        b.HasOne(x => x.NguoiDung).WithMany().HasForeignKey(x => x.NguoiDungId).OnDelete(DeleteBehavior.Cascade);
+    }
+}

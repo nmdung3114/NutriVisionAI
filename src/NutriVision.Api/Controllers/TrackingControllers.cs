@@ -22,3 +22,16 @@ public class WeightController(IWeightService weight) : ApiControllerBase
         return Success("Đã xóa bản ghi cân nặng.");
     }
 }
+
+[Route("api/water"), Authorize]
+public class WaterController(IWaterService water) : ApiControllerBase
+{
+    /// <summary>Lượng nước của ngày (mặc định hôm nay), mục tiêu theo cân nặng và 7 ngày gần nhất.</summary>
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] DateOnly? ngay, CancellationToken ct) => Success(await water.GetAsync(ngay, ct));
+
+    /// <summary>Cộng thêm (ml &gt; 0) hoặc hoàn tác (ml &lt; 0) lượng nước.</summary>
+    [HttpPost]
+    public async Task<IActionResult> Add(AddWaterRequest request, CancellationToken ct) => Success(await water.AddAsync(request, ct));
+}
+

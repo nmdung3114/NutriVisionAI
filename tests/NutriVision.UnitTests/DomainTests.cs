@@ -181,3 +181,16 @@ public class StreakCalculatorTests
         Assert.Equal(Today.AddDays(-10), r.LongestEnd);
     }
 }
+
+public class WaterTargetTests
+{
+    [Theory]
+    [InlineData(null, 2000)]
+    [InlineData(0, 2000)]
+    [InlineData(55, 1950)]   // 1925 → 1950
+    [InlineData(68, 2400)]   // 2380 → 2400
+    [InlineData(30, 1500)]   // dưới mức tối thiểu
+    [InlineData(150, 4000)]  // trên mức tối đa
+    public void Target_is_35ml_per_kg_rounded_and_clamped(int? kg, int expected) =>
+        Assert.Equal(expected, WaterTarget.ForWeight(kg));
+}

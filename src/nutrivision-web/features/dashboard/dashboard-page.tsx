@@ -17,6 +17,7 @@ import { MonthHeatmap } from "./month-heatmap";
 import { StreakCard } from "./streak-card";
 import { WeeklyInsights } from "./weekly-insights";
 import { QuickLog } from "@/features/meals/quick/quick-log";
+import { WaterCard } from "@/features/tracking/water-card";
 
 function DashboardSkeleton() {
   return (
@@ -100,6 +101,7 @@ export function DashboardPage() {
         </div>
         <div className="space-y-6">
           <StreakCard />
+          <WaterCard compact />
           <Suggestions />
         </div>
       </div>

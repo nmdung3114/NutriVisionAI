@@ -417,3 +417,46 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261112090837_ThemNhatKyNuocUong'
+)
+BEGIN
+    CREATE TABLE [NhatKyNuocUong] (
+        [Id] uniqueidentifier NOT NULL,
+        [NguoiDungId] uniqueidentifier NOT NULL,
+        [Ngay] date NOT NULL,
+        [LuongMl] int NOT NULL,
+        [NgayCapNhat] datetimeoffset NOT NULL,
+        CONSTRAINT [PK_NhatKyNuocUong] PRIMARY KEY ([Id]),
+        CONSTRAINT [CK_NhatKyNuocUong_LuongMl] CHECK ([LuongMl] >= 0 AND [LuongMl] <= 10000),
+        CONSTRAINT [FK_NhatKyNuocUong_NguoiDung_NguoiDungId] FOREIGN KEY ([NguoiDungId]) REFERENCES [NguoiDung] ([Id]) ON DELETE CASCADE
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261112090837_ThemNhatKyNuocUong'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_NhatKyNuocUong_NguoiDungId_Ngay] ON [NhatKyNuocUong] ([NguoiDungId], [Ngay]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261112090837_ThemNhatKyNuocUong'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261112090837_ThemNhatKyNuocUong', N'8.0.34');
+END;
+GO
+
+COMMIT;
+GO
+

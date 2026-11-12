@@ -352,6 +352,35 @@ namespace NutriVision.Infrastructure.Persistence.Migrations
                     b.ToTable("NhatKyHeThong", (string)null);
                 });
 
+            modelBuilder.Entity("NutriVision.Domain.Entities.NhatKyNuocUong", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("LuongMl")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Ngay")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("NgayCapNhat")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("NguoiDungId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NguoiDungId", "Ngay")
+                        .IsUnique();
+
+                    b.ToTable("NhatKyNuocUong", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_NhatKyNuocUong_LuongMl", "[LuongMl] >= 0 AND [LuongMl] <= 10000");
+                        });
+                });
+
             modelBuilder.Entity("NutriVision.Domain.Entities.ThanhPhanBuaAn", b =>
                 {
                     b.Property<Guid>("Id")
@@ -617,6 +646,17 @@ namespace NutriVision.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("NguoiDungThucHien");
+                });
+
+            modelBuilder.Entity("NutriVision.Domain.Entities.NhatKyNuocUong", b =>
+                {
+                    b.HasOne("NutriVision.Domain.Entities.NguoiDung", "NguoiDung")
+                        .WithMany()
+                        .HasForeignKey("NguoiDungId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NguoiDung");
                 });
 
             modelBuilder.Entity("NutriVision.Domain.Entities.ThanhPhanBuaAn", b =>

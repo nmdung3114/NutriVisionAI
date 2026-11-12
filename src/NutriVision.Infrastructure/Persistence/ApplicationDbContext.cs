@@ -16,6 +16,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<LichSuNhanDienAI> LichSuNhanDienAIs => Set<LichSuNhanDienAI>();
     public DbSet<NhatKyHeThong> NhatKyHeThongs => Set<NhatKyHeThong>();
     public DbSet<NhatKyCanNang> NhatKyCanNangs => Set<NhatKyCanNang>();
+    public DbSet<NhatKyNuocUong> NhatKyNuocUongs => Set<NhatKyNuocUong>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

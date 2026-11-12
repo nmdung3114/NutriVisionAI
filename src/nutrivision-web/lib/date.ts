@@ -43,6 +43,12 @@ export function weekdayName(s: string): string {
   return WEEKDAYS[parseDateOnly(s).getDay()];
 }
 
+/** Thứ viết tắt: CN, T2 … T7. */
+export function weekdayShort(s: string): string {
+  const d = parseDateOnly(s).getDay();
+  return d === 0 ? "CN" : `T${d + 1}`;
+}
+
 /** "Hôm nay" / "Hôm qua" / "Thứ ba, 12/05/2026" */
 export function relativeDayLabel(s: string, today: string = todayStr()): string {
   if (s === today) return "Hôm nay";

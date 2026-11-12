@@ -44,3 +44,16 @@ public static class HealthMetricsCalculator
         _ => "Béo phì",
     };
 }
+
+/// <summary>Khuyến nghị nước uống: 35 ml/kg cân nặng, làm tròn 50 ml, giới hạn 1500–4000 ml; mặc định 2000 ml khi chưa có cân nặng.</summary>
+public static class WaterTarget
+{
+    public const int DefaultMl = 2000, MinMl = 1500, MaxMl = 4000, MaxPerDayMl = 10000;
+
+    public static int ForWeight(decimal? canNangKg)
+    {
+        if (canNangKg is not > 0) return DefaultMl;
+        var ml = (int)(Math.Round(canNangKg.Value * 35m / 50m, MidpointRounding.AwayFromZero) * 50);
+        return Math.Clamp(ml, MinMl, MaxMl);
+    }
+}
