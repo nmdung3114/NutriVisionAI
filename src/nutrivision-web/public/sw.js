@@ -47,3 +47,16 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
+// Thông báo nhắc bữa: bấm vào → mở/tập trung cửa sổ ứng dụng đúng trang.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "/meals/new", self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      const client = list.find((c) => c.url.startsWith(self.location.origin));
+      if (client) return client.navigate(target).then((c) => (c ?? client).focus());
+      return self.clients.openWindow(target);
+    }),
+  );
+});

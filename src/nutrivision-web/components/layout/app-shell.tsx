@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 import { BottomNav } from "./bottom-nav";
+import { MealReminderRunner } from "./meal-reminder-runner";
 
 export function FullPageLoader() {
   return (
@@ -63,6 +64,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </main>
         </div>
         <BottomNav />
+        <MealReminderRunner />
       </div>
     </AuthGuard>
   );
