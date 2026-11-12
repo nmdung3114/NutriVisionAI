@@ -24,6 +24,9 @@ public interface IMealService
     Task CancelDraftAsync(Guid id, CancellationToken ct = default);
     Task DeleteAsync(Guid id, CancellationToken ct = default);
     Task<MealHistoryResult> ListAsync(MealHistoryQuery query, CancellationToken ct = default);
+    /// <summary>Ghi nhanh: tạo bữa đã xác nhận mới từ một bữa cũ (không sao chép ảnh).</summary>
+    Task<MealDto> RepeatAsync(Guid id, MealRepeatRequest request, CancellationToken ct = default);
+    Task<IReadOnlyList<FrequentMealDto>> FrequentAsync(int limit, CancellationToken ct = default);
     /// <summary>Dọn bản nháp bị bỏ dở quá hạn (xóa cả ảnh đã upload – BR-25). Trả về số bản nháp đã dọn.</summary>
     Task<int> CleanupAbandonedDraftsAsync(CancellationToken ct = default);
 }
@@ -194,6 +197,71 @@ public class MealService(
         }, ct);
 
         return await GetAsync(meal.Id, ct);
+    }
+
+    public async Task<MealDto> RepeatAsync(Guid id, MealRepeatRequest request, CancellationToken ct = default)
+    {
+        var userId = currentUser.RequireUserId();
+        var source = await LoadAsync(userId, id, tracking: false, ct);
+        if (!source.DaXacNhan) throw new ConflictException("Chỉ có thể ăn lại bữa đã được xác nhận.");
+
+        var now = clock.UtcNow;
+        var meal = new BuaAn
+        {
+            NguoiDungId = userId,
+            LoaiBuaAn = request.LoaiBuaAn ?? source.LoaiBuaAn,
+            NgayAn = request.NgayAn ?? clock.Today,
+            ThoiGianGhiNhan = now,
+            TenMonAn = source.TenMonAn,
+            TaoTuAI = false, // bữa mới do người dùng chủ động ghi, không qua AI
+            NgayTao = now,
+            NgayCapNhat = now,
+        };
+        // Giữ nguyên giá trị dinh dưỡng đã chốt của từng thành phần (không tính lại theo bảng tham chiếu hiện tại).
+        foreach (var t in source.ThanhPhans)
+        {
+            var copy = new ThanhPhanBuaAn
+            {
+                BuaAnId = meal.Id, ThucPhamThamChieuId = t.ThucPhamThamChieuId, TenThanhPhan = t.TenThanhPhan,
+                KhauPhan = t.KhauPhan, DonViTinh = t.DonViTinh, KhoiLuongQuyDoiGram = t.KhoiLuongQuyDoiGram,
+            };
+            copy.GanDinhDuong(t.DinhDuong);
+            meal.ThanhPhans.Add(copy);
+        }
+        meal.GanTongDinhDuong(NutritionCalculator.Tong(meal.ThanhPhans.Select(t => t.DinhDuong)), now);
+        meal.XacNhan(now);
+
+        await db.ExecuteInTransactionAsync(async () =>
+        {
+            db.BuaAns.Add(meal);
+            audit.Ghi(HanhDong.XacNhanBuaAn, "BuaAn", meal.Id.ToString(), $"Ăn lại '{meal.TenMonAn}' từ bữa {source.Id} ({meal.TongCalo} kcal)");
+            await db.SaveChangesAsync(ct);
+            await dailySummary.RecomputeAsync(userId, meal.NgayAn, ct);
+        }, ct);
+        return await GetAsync(meal.Id, ct);
+    }
+
+    public async Task<IReadOnlyList<FrequentMealDto>> FrequentAsync(int limit, CancellationToken ct = default)
+    {
+        var userId = currentUser.RequireUserId();
+        limit = Math.Clamp(limit, 1, 20);
+        var since = clock.Today.AddDays(-90);
+        var meals = await db.BuaAns.AsNoTracking()
+            .Where(b => b.NguoiDungId == userId && b.DaXacNhan && !b.DaXoa && b.NgayAn >= since)
+            .Select(b => new { b.Id, b.TenMonAn, b.TongCalo, b.LoaiBuaAn, b.NgayAn, b.ThoiGianGhiNhan, b.DuongDanHinhAnh })
+            .ToListAsync(ct);
+
+        return meals
+            .GroupBy(m => TextNormalizer.Chuan(m.TenMonAn))
+            .Select(g =>
+            {
+                var latest = g.OrderByDescending(m => m.NgayAn).ThenByDescending(m => m.ThoiGianGhiNhan).First();
+                var loai = g.GroupBy(m => m.LoaiBuaAn).OrderByDescending(x => x.Count()).First().Key;
+                var anh = g.OrderByDescending(m => m.ThoiGianGhiNhan).Select(m => m.DuongDanHinhAnh).FirstOrDefault(p => p != null);
+                return new FrequentMealDto(latest.Id, latest.TenMonAn, g.Count(), latest.TongCalo, loai, latest.NgayAn, mapper.SignPath(anh));
+            })
+            .OrderByDescending(x => x.SoLan).ThenByDescending(x => x.LanCuoi)
+            .Take(limit).ToList();
     }
 
     public async Task<MealDto> GetAsync(Guid id, CancellationToken ct = default)

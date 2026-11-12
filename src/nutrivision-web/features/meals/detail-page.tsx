@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Pencil, Sparkles, Trash2, Undo2 } from "lucide-react";
+import { ArrowLeft, CopyPlus, Loader2, Pencil, Sparkles, Trash2, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -24,6 +24,7 @@ import { MealTypeBadge } from "@/components/shared/meal-type-badge";
 import { dailyMacroTargets, percentOf } from "@/lib/nutrition";
 import { MealEditor } from "./editor/meal-editor";
 import { DeleteMealDialog } from "./delete-meal-dialog";
+import { useRepeatMeal } from "./quick/use-repeat-meal";
 import { normalizeConfidence } from "./editor/editor-state";
 import type { Meal } from "@/types/api";
 
@@ -71,6 +72,7 @@ export function MealDetailPage({ id }: { id: string }) {
   const [editing, setEditing] = useState(sp.get("edit") === "1");
   const [del, setDel] = useState(false);
   const [revertOpen, setRevertOpen] = useState(false);
+  const repeat = useRepeatMeal();
 
   useEffect(() => {
     if (meal && !meal.daXacNhan) router.replace(`/meals/review/${meal.id}`);
@@ -140,6 +142,9 @@ export function MealDetailPage({ id }: { id: string }) {
                 <Undo2 /> Hoàn tác về AI gốc
               </Button>
             )}
+            <Button variant="outline" disabled={repeat.isPending} onClick={() => repeat.mutate({ id: meal.id })}>
+              {repeat.isPending ? <Loader2 className="animate-spin" /> : <CopyPlus />} Ăn lại hôm nay
+            </Button>
             <Button onClick={() => setEditing(true)}>
               <Pencil /> Sửa
             </Button>

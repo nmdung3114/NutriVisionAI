@@ -9,6 +9,12 @@ public record ComponentInput(
 
 public record MealUpsertRequest(string LoaiBuaAn, DateOnly? NgayAn, string TenMonAn, List<ComponentInput> ThanhPhan);
 
+/// <summary>Ăn lại một bữa đã ghi: sao chép thành phần sang ngày/loại bữa mới (mặc định hôm nay, giữ loại bữa cũ).</summary>
+public record MealRepeatRequest(string? LoaiBuaAn, DateOnly? NgayAn);
+
+/// <summary>Món hay ăn trong 90 ngày, gộp theo tên; MauBuaAnId là lần ăn gần nhất để "ăn lại".</summary>
+public record FrequentMealDto(Guid MauBuaAnId, string TenMonAn, int SoLan, decimal Calo, string LoaiBuaAn, DateOnly LanCuoi, string? HinhAnhUrl);
+
 public record MealComponentDto(
     Guid? Id, Guid? ThucPhamThamChieuId, string TenThanhPhan, decimal KhauPhan, string DonViTinh, decimal KhoiLuongQuyDoiGram,
     decimal LuongCalo, decimal LuongChatDam, decimal LuongTinhBot, decimal LuongChatBeo, decimal LuongChatXo,

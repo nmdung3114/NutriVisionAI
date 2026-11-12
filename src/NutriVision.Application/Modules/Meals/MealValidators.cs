@@ -4,6 +4,18 @@ using NutriVision.Domain.Constants;
 
 namespace NutriVision.Application.Modules.Meals;
 
+public class MealRepeatRequestValidator : AbstractValidator<MealRepeatRequest>
+{
+    public MealRepeatRequestValidator(AppClock clock)
+    {
+        RuleFor(x => x.LoaiBuaAn!).Must(LoaiBuaAn.IsValid).WithMessage("Loại bữa ăn không hợp lệ (Sang, Trua, Toi, Phu).").When(x => x.LoaiBuaAn != null);
+        RuleFor(x => x.NgayAn!.Value)
+            .Must(d => d <= clock.Today).WithMessage("Ngày ăn không được ở tương lai.")
+            .Must(d => d >= clock.Today.AddYears(-2)).WithMessage("Ngày ăn quá xa trong quá khứ.")
+            .When(x => x.NgayAn.HasValue);
+    }
+}
+
 public class NutritionPer100gInputValidator : AbstractValidator<NutritionPer100gInput>
 {
     public NutritionPer100gInputValidator()

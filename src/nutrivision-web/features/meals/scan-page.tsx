@@ -12,6 +12,7 @@ import { mealsApi } from "@/lib/api/meals";
 import { ApiError, errorHint, errorMessage } from "@/lib/api/errors";
 import { formatBytes, validateMealImage } from "@/lib/image";
 import { MEAL_THEME, MEAL_TYPES, isMealType, mealTypeByHour } from "@/lib/meal";
+import { QuickLog } from "./quick/quick-log";
 import { cn } from "@/lib/utils";
 import type { LoaiBuaAn } from "@/types/api";
 import { CameraDialog } from "./camera-dialog";
@@ -225,6 +226,11 @@ export function ScanPage() {
           {scanning ? <Loader2 className="animate-spin" /> : <ScanLine />} TIẾP TỤC NHẬN DIỆN AI
         </Button>
       </div>
+      {!scanning && (
+        <div className="mt-8">
+          <QuickLog title="Hoặc ghi lại món hay ăn" compact loai={loai} />
+        </div>
+      )}
       <CameraDialog open={camera} onOpenChange={setCamera} onCapture={(f) => void accept(f)} />
     </div>
   );

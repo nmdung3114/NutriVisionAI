@@ -26,6 +26,19 @@ public class MealsController(IMealService meals) : ApiControllerBase
         return StatusCode(201, NutriVision.Api.Common.ApiResponse.Ok(meal, "Đã lưu bữa ăn."));
     }
 
+    /// <summary>Ghi nhanh: ăn lại một bữa đã ghi (mặc định hôm nay, cùng loại bữa).</summary>
+    [HttpPost("{id:guid}/repeat")]
+    public async Task<IActionResult> Repeat(Guid id, MealRepeatRequest request, CancellationToken ct)
+    {
+        var meal = await meals.RepeatAsync(id, request, ct);
+        return Success(meal, "Đã ghi lại bữa ăn.");
+    }
+
+    /// <summary>Món hay ăn (90 ngày gần nhất) để ghi nhanh.</summary>
+    [HttpGet("frequent")]
+    public async Task<IActionResult> Frequent([FromQuery] int limit = 6, CancellationToken ct = default) =>
+        Success(await meals.FrequentAsync(limit, ct));
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id, CancellationToken ct) => Success(await meals.GetAsync(id, ct));
 

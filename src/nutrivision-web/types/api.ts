@@ -345,3 +345,13 @@ export interface WeeklyInsights {
   caloTrungBinh: number;
   nhanXet: Insight[];
 }
+
+export interface FrequentMeal {
+  mauBuaAnId: string;
+  tenMonAn: string;
+  soLan: number;
+  calo: number;
+  loaiBuaAn: LoaiBuaAn;
+  lanCuoi: string;
+  hinhAnhUrl: string | null;
+}

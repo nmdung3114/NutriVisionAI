@@ -15,6 +15,7 @@ export const qk = {
   profile: ["profile"] as const,
   units: ["foods", "units"] as const,
   suggestions: ["suggestions"] as const,
+  frequent: ["meals", "frequent"] as const,
   meal: (id: string) => ["meal", id] as const,
   history: (p: HistoryParams) => ["meals", "history", p] as const,
   report: (from?: string, to?: string) => ["report", from, to] as const,
@@ -25,6 +26,7 @@ export const useCalendar = (nam: number, thang: number) =>
   useQuery({ queryKey: qk.calendar(nam, thang), queryFn: () => dashboardApi.calendar(nam, thang), placeholderData: keepPreviousData });
 export const useStreak = () => useQuery({ queryKey: qk.streak, queryFn: dashboardApi.streak });
 export const useInsights = () => useQuery({ queryKey: qk.insights, queryFn: dashboardApi.insights });
+export const useFrequentMeals = () => useQuery({ queryKey: qk.frequent, queryFn: () => mealsApi.frequent(6) });
 export const useProfile = () => useQuery({ queryKey: qk.profile, queryFn: profileApi.get });
 export const useSuggestions = () => useQuery({ queryKey: qk.suggestions, queryFn: foodsApi.suggestions, staleTime: 5 * 60_000 });
 export const useUnits = () => useQuery({ queryKey: qk.units, queryFn: foodsApi.units, staleTime: Infinity });

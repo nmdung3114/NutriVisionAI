@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { LoaiBuaAn, Meal, MealHistory, MealUpsert } from "@/types/api";
+import type { FrequentMeal, LoaiBuaAn, Meal, MealHistory, MealUpsert } from "@/types/api";
 
 export interface HistoryParams {
   from?: string;
@@ -25,6 +25,9 @@ export const mealsApi = {
   revert: (id: string) => api<Meal>(`/api/meals/${id}/revert`, { method: "POST" }),
   cancel: (id: string) => api<null>(`/api/meals/${id}/cancel`, { method: "DELETE" }),
   remove: (id: string) => api<null>(`/api/meals/${id}`, { method: "DELETE" }),
+  repeat: (id: string, b: { loaiBuaAn?: LoaiBuaAn; ngayAn?: string } = {}) =>
+    api<Meal>(`/api/meals/${id}/repeat`, { method: "POST", body: b }),
+  frequent: (limit = 6) => api<FrequentMeal[]>("/api/meals/frequent", { query: { limit } }),
   history: (p: HistoryParams) =>
     api<MealHistory>("/api/meals", { query: { ...p } }),
 };
