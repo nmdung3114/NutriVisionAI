@@ -11,7 +11,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { mealsApi } from "@/lib/api/meals";
 import { ApiError, errorHint, errorMessage } from "@/lib/api/errors";
 import { formatBytes, validateMealImage } from "@/lib/image";
-import { MEAL_TYPES, isMealType, mealTypeByHour } from "@/lib/meal";
+import { MEAL_THEME, MEAL_TYPES, isMealType, mealTypeByHour } from "@/lib/meal";
 import { cn } from "@/lib/utils";
 import type { LoaiBuaAn } from "@/types/api";
 import { CameraDialog } from "./camera-dialog";
@@ -116,7 +116,7 @@ export function ScanPage() {
               onClick={() => setLoai(t.value)}
               className={cn(
                 "flex items-center justify-center gap-2 rounded-xl border px-3 py-3 text-sm font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                loai === t.value ? "border-primary bg-primary text-primary-foreground shadow-md" : "bg-card hover:border-primary/50",
+                loai === t.value ? cn("scale-[1.02] border-transparent shadow-md", MEAL_THEME[t.value].solid) : "bg-card hover:-translate-y-0.5 hover:border-primary/50",
               )}
             >
               <span aria-hidden>{t.emoji}</span>

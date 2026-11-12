@@ -20,6 +20,7 @@ import { mealsApi } from "@/lib/api/meals";
 import { errorMessage } from "@/lib/api/errors";
 import { formatDate, formatTime } from "@/lib/date";
 import { fmt, mealTypeLabel } from "@/lib/meal";
+import { MealTypeBadge } from "@/components/shared/meal-type-badge";
 import { dailyMacroTargets, percentOf } from "@/lib/nutrition";
 import { MealEditor } from "./editor/meal-editor";
 import { DeleteMealDialog } from "./delete-meal-dialog";
@@ -127,7 +128,7 @@ export function MealDetailPage({ id }: { id: string }) {
         title={meal.tenMonAn}
         description={
           <span className="flex flex-wrap items-center gap-2">
-            {mealTypeLabel(meal.loaiBuaAn)} · {formatDate(meal.ngayAn)} · {formatTime(meal.thoiGianGhiNhan)}
+            <MealTypeBadge loai={meal.loaiBuaAn} /> {formatDate(meal.ngayAn)} · {formatTime(meal.thoiGianGhiNhan)}
             {meal.taoTuAI && <Badge variant="secondary" className="gap-1 rounded-full"><Sparkles className="size-3" /> AI{conf !== null ? ` ${conf}%` : ""}</Badge>}
             {meal.nguoiDungCoSua && <Badge variant="outline" className="rounded-full">Đã chỉnh sửa</Badge>}
           </span>
