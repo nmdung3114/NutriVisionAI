@@ -51,14 +51,37 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     public FakeVisionClient Vision { get; } = new();
     public CapturingEmailSender Email { get; } = new();
     private static readonly string Dir = Path.Combine(Path.GetTempPath(), "nv-tests-" + Guid.NewGuid().ToString("N"));
+    private static bool UsesSqlServer;
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (UsesSqlServer)
+        {
+            using var scope = Services.CreateScope();
+            await scope.ServiceProvider.GetRequiredService<NutriVision.Infrastructure.Persistence.ApplicationDbContext>().Database.EnsureDeletedAsync();
+        }
+        await base.DisposeAsync();
+    }
 
     // Program.cs đọc cấu hình ngay khi tạo builder, nên dùng biến môi trường (có hiệu lực từ đầu).
     static ApiFactory()
     {
         Directory.CreateDirectory(Dir);
         void Set(string k, string v) => Environment.SetEnvironmentVariable(k, v);
-        Set("Database__Provider", "Sqlite");
-        Set("Database__ConnectionString", $"Data Source={Path.Combine(Dir, "test.db")}");
+        // Mặc định SQLite tạm. Đặt NV_TEST_SQLSERVER (vd "Server=localhost,1433;User Id=sa;Password=...;TrustServerCertificate=True")
+        // để chạy toàn bộ integration test trên SQL Server thật: tạo database riêng nv_test_<guid>, xóa khi xong.
+        var sqlServer = Environment.GetEnvironmentVariable("NV_TEST_SQLSERVER");
+        if (string.IsNullOrWhiteSpace(sqlServer))
+        {
+            Set("Database__Provider", "Sqlite");
+            Set("Database__ConnectionString", $"Data Source={Path.Combine(Dir, "test.db")}");
+        }
+        else
+        {
+            Set("Database__Provider", "SqlServer");
+            Set("Database__ConnectionString", $"{sqlServer.TrimEnd(';')};Database=nv_test_{Guid.NewGuid():N}");
+            UsesSqlServer = true;
+        }
         Set("Database__SeedDemoAccounts", "true");
         Set("Jwt__Secret", "integration-test-secret-key-0123456789-abcdef");
         Set("Storage__RootPath", Path.Combine(Dir, "uploads"));

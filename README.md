@@ -33,9 +33,9 @@ tools/mock-ai-server/            Mock AI đúng hợp đồng để phát triể
 
 Phụ thuộc một chiều: `Api → Infrastructure → Application → Domain`. Tầng Application chỉ biết các interface; mọi dịch vụ ngoài (AI, email, storage) có thể thay thế mà không đổi nghiệp vụ.
 
-## 2. Chạy nhanh (môi trường dev, không cần SQL Server)
+## 2. Chạy nhanh
 
-Yêu cầu: .NET SDK 8 (hoặc mới hơn), Node.js ≥ 20.9.
+Yêu cầu: .NET SDK 8 (hoặc mới hơn), Node.js ≥ 20.9, **Docker** (để chạy SQL Server). Không có Docker vẫn chạy được bằng SQLite.
 
 ### Cài toàn bộ package (một lệnh)
 
@@ -46,29 +46,36 @@ setup.bat             # Windows      (thêm --verify tương tự)
 
 Script kiểm tra phiên bản .NET/Node rồi cài: công cụ `dotnet-ef` (manifest `.config/dotnet-tools.json`), toàn bộ NuGet package (`dotnet restore`), npm package theo `package-lock.json` (`npm ci`), và tạo `src/nutrivision-web/.env.local` nếu chưa có.
 
-Sau đó chạy `./run_all.sh` (Linux/macOS) hoặc `run_all.bat` (Windows), hoặc chạy từng phần:
+### Chạy
 
 ```bash
-# Backend: http://localhost:5000  (Swagger: /swagger) — dùng SQLite App_Data/nutrivision-dev.db, tự tạo CSDL + seed
-cd src/NutriVision.Api && dotnet run --launch-profile http
-
-# Frontend: http://localhost:3000
-cd src/nutrivision-web && npm run dev
+./run_all.sh          # Linux/macOS
+run_all.bat           # Windows
 ```
+Script tự bật **SQL Server 2022 trong Docker** (`docker compose up -d --wait`), rồi chạy backend `http://localhost:5000` (Swagger `/swagger`) và frontend `http://localhost:3000`. Lần đầu khởi động, migration tự tạo database `NutriVisionDb` và nạp dữ liệu. Máy không có Docker → script tự chuyển sang SQLite (`App_Data/nutrivision-dev.db`).
 
+Chạy từng phần:
+```bash
+docker compose up -d --wait                                      # SQL Server
+cd src/NutriVision.Api && dotnet run --launch-profile http       # backend + SQL Server
+#                         dotnet run --launch-profile http-sqlite  ← backend + SQLite (không cần Docker)
+cd src/nutrivision-web && npm run dev                            # frontend
+```
+Dừng SQL Server: `docker compose stop` · xóa sạch dữ liệu: `docker compose down -v`.
 
-Tài khoản demo (chỉ seed ở Development): `user@nutrivision.ai / User@123` (có hồ sơ), `admin@nutrivision.ai / Admin@123`.
+Tài khoản demo (chỉ seed ở Development): `user@nutrivision.ai / User@123` (có hồ sơ + ~30 ngày dữ liệu minh họa), `admin@nutrivision.ai / Admin@123`.
+
+### Xem database bằng DBeaver / SSMS / Azure Data Studio
+
+| Mục | Giá trị |
+|---|---|
+| Loại kết nối | SQL Server |
+| Host / Port | `localhost` / `1433` |
+| Database | `NutriVisionDb` |
+| User / Password | `sa` / `NutriVision@2026` (chỉ dùng cho máy dev) |
+| Driver property | `trustServerCertificate = true` |
 
 Email ở môi trường dev **không gửi thật**: nội dung (kèm link xác thực / đặt lại mật khẩu) được ghi vào `src/NutriVision.Api/App_Data/outbox/*.html` và log.
-
-### Chức năng nổi bật
-
-- Quét ảnh món ăn bằng AI → hiệu chỉnh → lưu; ghi nhanh “ăn lại” và món hay ăn
-- Dashboard: vòng dinh dưỡng kiểu Apple Watch, lịch nhiệt theo tháng, chuỗi ngày + 9 huy hiệu, nhận xét tự động theo tuần
-- Theo dõi cân nặng (biểu đồ, đồng bộ hồ sơ) và nước uống (mục tiêu 35 ml/kg)
-- Báo cáo + xuất PDF/CSV, chia sẻ thẻ tổng kết ngày dạng ảnh
-- Chế độ sáng/tối, màu riêng cho từng bữa, giao diện mobile (vuốt để xóa), cài như ứng dụng (PWA), nhắc giờ ăn bằng thông báo
-- Quản trị: thống kê, người dùng, nhật ký hệ thống
 
 ## 3. Cấu hình cho môi trường thật
 
@@ -93,7 +100,9 @@ Khi chưa cấu hình AI, chức năng quét ảnh vẫn chạy trọn luồng: 
 ## 4. Kiểm thử
 
 ```bash
-dotnet test NutriVision.sln                      # unit + integration test
+dotnet test NutriVision.sln                      # unit + integration test (SQLite tạm)
+NV_TEST_SQLSERVER="Server=localhost,1433;User Id=sa;Password=NutriVision@2026;TrustServerCertificate=True" \
+  dotnet test tests/NutriVision.IntegrationTests  # integration test trên SQL Server thật (DB tạm, tự xóa)
 cd src/nutrivision-web && npm run lint && npx tsc --noEmit && npm test && npm run build
 ```
 

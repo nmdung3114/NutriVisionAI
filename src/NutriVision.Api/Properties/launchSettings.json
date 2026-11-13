@@ -6,6 +6,17 @@
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": { "ASPNETCORE_ENVIRONMENT": "Development" }
+    },
+    "http-sqlite": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Database__Provider": "Sqlite",
+        "Database__ConnectionString": "Data Source=App_Data/nutrivision-dev.db"
+      }
     }
   }
 }
