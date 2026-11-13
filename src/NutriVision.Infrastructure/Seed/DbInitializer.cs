@@ -33,7 +33,11 @@ public static class DbInitializer
         }
 
         if (settings.SeedFoods) await SeedFoodsAsync(db, logger, ct);
-        if (settings.SeedDemoAccounts) await SeedDemoAccountsAsync(db, sp.GetRequiredService<IPasswordHasher>(), sp.GetRequiredService<AppClock>(), logger, ct);
+        if (settings.SeedDemoAccounts)
+        {
+            await SeedDemoAccountsAsync(db, sp.GetRequiredService<IPasswordHasher>(), sp.GetRequiredService<AppClock>(), logger, ct);
+            await DemoHistorySeeder.SeedAsync(db, sp.GetRequiredService<Application.Modules.Meals.IDailySummaryService>(), sp.GetRequiredService<AppClock>(), logger, ct);
+        }
     }
 
     private static async Task SeedFoodsAsync(ApplicationDbContext db, ILogger logger, CancellationToken ct)
