@@ -1,73 +1,36 @@
-using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NutriVision.Api.Services.Interfaces;
+using NutriVision.Application.Modules.Admin;
+using NutriVision.Domain.Constants;
 
-namespace NutriVision.Api.Controllers
+namespace NutriVision.Api.Controllers;
+
+/// <summary>Khu vực quản trị: chỉ ADMIN (BR-12, BR-43). Không có endpoint nào trả dữ liệu bữa ăn/hồ sơ của người dùng.</summary>
+[Route("api/admin"), Authorize(Roles = VaiTro.Admin)]
+public class AdminController(IAdminService admin) : ApiControllerBase
 {
-    [Authorize(Roles = "ADMIN")] // BR-12, BR-43 & AC-15: Chặn User thường trả về 403 Forbidden
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AdminController : ControllerBase
-    {
-        private readonly IAdminService _adminService;
+    [HttpGet("users")]
+    public async Task<IActionResult> Users([FromQuery] string? q, [FromQuery] string? trangThai, [FromQuery] string? vaiTro,
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken ct = default) =>
+        Success(await admin.ListUsersAsync(q, trangThai, vaiTro, page, pageSize, ct));
 
-        public AdminController(IAdminService adminService)
-        {
-            _adminService = adminService;
-        }
+    [HttpPut("users/{id:guid}/status")]
+    public async Task<IActionResult> Status(Guid id, ChangeStatusRequest request, CancellationToken ct) =>
+        Success(await admin.ChangeStatusAsync(id, request, ct), request.TrangThai == TrangThaiTaiKhoan.Locked ? "Đã khóa tài khoản." : "Đã mở khóa tài khoản.");
 
-        private Guid GetAdminId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    [HttpPut("users/{id:guid}/role")]
+    public async Task<IActionResult> Role(Guid id, ChangeRoleRequest request, CancellationToken ct) =>
+        Success(await admin.ChangeRoleAsync(id, request, ct), "Đã cập nhật vai trò.");
 
-        [HttpGet("users")]
-        public async Task<IActionResult> GetUsers(
-            [FromQuery] string? search,
-            [FromQuery] string? status,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            var result = await _adminService.GetUsersAsync(search, status, page, pageSize);
-            return Ok(result);
-        }
+    [HttpGet("logs")]
+    public async Task<IActionResult> Logs([FromQuery] Guid? userId, [FromQuery] string? loai, [FromQuery] DateOnly? from, [FromQuery] DateOnly? to,
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 30, CancellationToken ct = default) =>
+        Success(await admin.ListLogsAsync(userId, loai, from, to, page, pageSize, ct));
 
-        [HttpPut("users/{id}/toggle-lock")]
-        public async Task<IActionResult> ToggleUserLock(Guid id)
-        {
-            var result = await _adminService.ToggleUserLockAsync(GetAdminId(), id);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
+    [HttpGet("logs/types")]
+    public async Task<IActionResult> LogTypes(CancellationToken ct) => Success(await admin.LogTypesAsync(ct));
 
-        public class ChangeRoleBody
-        {
-            public string Role { get; set; } = "USER";
-        }
-
-        [HttpPut("users/{id}/change-role")]
-        public async Task<IActionResult> ChangeUserRole(Guid id, [FromBody] ChangeRoleBody body)
-        {
-            var result = await _adminService.ChangeUserRoleAsync(GetAdminId(), id, body.Role);
-            if (!result.Success) return BadRequest(result);
-            return Ok(result);
-        }
-
-        [HttpGet("logs")]
-        public async Task<IActionResult> GetSystemLogs(
-            [FromQuery] string? actionType,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
-        {
-            var result = await _adminService.GetSystemLogsAsync(actionType, page, pageSize);
-            return Ok(result);
-        }
-
-        [HttpGet("statistics")]
-        public async Task<IActionResult> GetStatistics()
-        {
-            var result = await _adminService.GetAdminStatsAsync();
-            return Ok(result);
-        }
-    }
+    [HttpGet("statistics")]
+    public async Task<IActionResult> Statistics([FromQuery] DateOnly? from, [FromQuery] DateOnly? to, CancellationToken ct) =>
+        Success(await admin.StatisticsAsync(from, to, ct));
 }

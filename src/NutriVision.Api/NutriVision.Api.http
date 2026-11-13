@@ -1,6 +1,19 @@
-@NutriVision.Api_HostAddress = http://localhost:5113
+@api = http://localhost:5000
 
-GET {{NutriVision.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Health
+GET {{api}}/health
 
-###
+### Đăng nhập (tài khoản demo môi trường Development)
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "user@nutrivision.ai", "matKhau": "User@123" }
+
+### Tìm thực phẩm (dán accessToken vào biến token)
+@token = PASTE_ACCESS_TOKEN
+GET {{api}}/api/foods?q=pho
+Authorization: Bearer {{token}}
+
+### Dashboard
+GET {{api}}/api/dashboard
+Authorization: Bearer {{token}}

@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NutriVision AI – Web (Next.js)
 
-## Getting Started
+Giao diện web tiếng Việt cho NutriVision AI. Next.js 15 (App Router) · TypeScript strict · Tailwind CSS v4 · shadcn/ui (Radix) · TanStack Query · react-hook-form + zod · Recharts · framer-motion.
 
-First, run the development server:
+## Chạy
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.local.example .env.local   # NEXT_PUBLIC_API_URL mặc định http://localhost:5000
+npm install
+npm run dev                        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Backend ASP.NET Core cần chạy tại `http://localhost:5000` (kiểm tra `GET /health`) và cho phép CORS từ `http://localhost:3000`
+(và `Access-Control-Expose-Headers: Content-Disposition` để tải PDF/CSV đúng tên file).
+Tài khoản dev: `admin@nutrivision.ai / Admin@123`, `user@nutrivision.ai / User@123`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Lệnh
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Lệnh | Mục đích |
+|---|---|
+| `npm run dev` | chạy dev |
+| `npm run build` / `npm start` | build / chạy production |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | vitest (tính toán dinh dưỡng, mật khẩu, ngày, loại bữa, BMI) |
 
-## Learn More
+## Cấu trúc
 
-To learn more about Next.js, take a look at the following resources:
+- `app/` – route mỏng: `(auth)` (khách), `(link)` (verify-email / reset-password), `(app)` (đã đăng nhập; `admin/` yêu cầu ADMIN)
+- `features/` – auth, dashboard, meals (scan, editor, history, detail), reports, profile, admin, landing
+- `components/ui` (shadcn), `components/shared`, `components/layout`
+- `lib/api` – client fetch trung tâm (Bearer, refresh single-flight, bóc envelope, `ApiError`), các module API theo contract
+- `lib/` – `nutrition` (quy đổi gram), `password`, `date`, `meal`, `health`, `image`; `providers/` – Auth & Query
+- Token: access token trong bộ nhớ, refresh token trong localStorage.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Tài liệu API: `docs/api-contract.md`. Ghi chú/câu hỏi cho backend: `docs/frontend-notes.md`.
