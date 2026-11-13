@@ -46,11 +46,13 @@ public class EmailSettings
 public class AiSettings
 {
     public const string Section = "Ai";
-    /// <summary>Gemini | None</summary>
+    /// <summary>Gemini | Http (dịch vụ AI riêng, xem docs/ai-integration.md) | None</summary>
     public string Provider { get; set; } = "None";
     public string ApiKey { get; set; } = string.Empty;
     public string Model { get; set; } = "gemini-2.5-flash";
     public string BaseUrl { get; set; } = "https://generativelanguage.googleapis.com";
     public int TimeoutSeconds { get; set; } = 30;
     public int MaxRetries { get; set; } = 2;
+    /// <summary>Chỉ dùng cho Provider=Http: đường dẫn endpoint nhận diện.</summary>
+    public string Path { get; set; } = "/analyze";
 }

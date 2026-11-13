@@ -51,6 +51,8 @@ public static class DependencyInjection
         var ai = config.GetSection(AiSettings.Section).Get<AiSettings>() ?? new AiSettings();
         if (ai.Provider.Equals("Gemini", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(ai.ApiKey))
             services.AddHttpClient<IVisionAiClient, GeminiVisionClient>(c => c.Timeout = Timeout.InfiniteTimeSpan); // timeout do client tự quản lý
+        else if (ai.Provider.Equals("Http", StringComparison.OrdinalIgnoreCase) && Uri.TryCreate(ai.BaseUrl, UriKind.Absolute, out _))
+            services.AddHttpClient<IVisionAiClient, HttpVisionClient>(c => c.Timeout = Timeout.InfiniteTimeSpan);
         else
             services.AddSingleton<IVisionAiClient, NullVisionClient>();
 
