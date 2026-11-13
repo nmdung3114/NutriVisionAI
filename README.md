@@ -25,6 +25,10 @@ tests/
 └── NutriVision.IntegrationTests Toàn bộ API qua WebApplicationFactory: kiểm tra các AC trong tài liệu phân tích
 database/schema.sql              Script SQL Server sinh từ migration (idempotent)
 docs/api-contract.md             Hợp đồng API giữa frontend và backend
+docs/ai-integration.md           Hợp đồng kết nối dịch vụ AI riêng (Provider=Http) + mock AI server
+docs/pipeline-integration.md     Tích hợp pipeline: quyền, quy ước dữ liệu, nạp tăng dần, đánh giá AI, ghi bảng thực phẩm
+database/pipeline-access.sql     Tài khoản SQL Server quyền tối thiểu cho pipeline
+tools/mock-ai-server/            Mock AI đúng hợp đồng để phát triển/demo
 ```
 
 Phụ thuộc một chiều: `Api → Infrastructure → Application → Domain`. Tầng Application chỉ biết các interface; mọi dịch vụ ngoài (AI, email, storage) có thể thay thế mà không đổi nghiệp vụ.
@@ -75,6 +79,7 @@ Mọi khóa bí mật đặt qua biến môi trường (hoặc `dotnet user-secr
 | SQL Server | `Database__Provider=SqlServer`, `Database__ConnectionString=Server=...;Database=NutriVisionDb;...` (migration tự áp dụng khi khởi động; hoặc chạy `database/schema.sql`) |
 | JWT (bắt buộc, ≥ 32 ký tự) | `Jwt__Secret=...` |
 | AI Gemini | `Ai__Provider=Gemini`, `Ai__ApiKey=<khóa từ Google AI Studio>`, tùy chọn `Ai__Model=gemini-2.5-flash` |
+| AI riêng của nhóm | `Ai__Provider=Http`, `Ai__BaseUrl=http://<dịch-vụ-ai>`, tùy chọn `Ai__ApiKey`, `Ai__Path=/analyze` (xem `docs/ai-integration.md`) |
 | Email SMTP | `Email__Provider=Smtp`, `Email__Host`, `Email__Port`, `Email__User`, `Email__Password`, `Email__FromAddress` |
 | Link trong email | `App__FrontendUrl=https://...` |
 | CORS | `Cors__Origins__0=https://...` |
