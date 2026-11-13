@@ -122,6 +122,7 @@ public class MealService(
             DuongDanHinhAnh = saved.RelativePath,
             ThoiGianXuLyMs = ai.ProcessingMs,
             NgayTao = now,
+            NgayCapNhat = now,
         };
 
         try
@@ -293,6 +294,7 @@ public class MealService(
                 var original = MealJson.Deserialize(ls.PhanHoiAIGoc);
                 ls.TenMonNguoiDungChot = meal.TenMonAn;
                 ls.NguoiDungCoSua = original is null || MealMapper.IsModified(original, meal.TenMonAn, computed);
+                ls.NgayCapNhat = clock.UtcNow;
             }
 
             audit.Ghi(HanhDong.XacNhanBuaAn, "BuaAn", meal.Id.ToString(), $"Xác nhận bữa '{meal.TenMonAn}' ({meal.TongCalo} kcal)");
@@ -324,6 +326,7 @@ public class MealService(
                 var original = MealJson.Deserialize(ls.PhanHoiAIGoc);
                 ls.TenMonNguoiDungChot = meal.TenMonAn;
                 ls.NguoiDungCoSua = original is null || MealMapper.IsModified(original, meal.TenMonAn, computed);
+                ls.NgayCapNhat = clock.UtcNow;
             }
 
             audit.Ghi(HanhDong.SuaBuaAn, "BuaAn", meal.Id.ToString(), $"Sửa bữa '{meal.TenMonAn}' ({meal.TongCalo} kcal)");
@@ -358,6 +361,7 @@ public class MealService(
             {
                 ls.NguoiDungCoSua = false;
                 if (meal.DaXacNhan) ls.TenMonNguoiDungChot = original.TenMonAn;
+                ls.NgayCapNhat = clock.UtcNow;
             }
             if (meal.DaXacNhan)
                 audit.Ghi(HanhDong.SuaBuaAn, "BuaAn", meal.Id.ToString(), "Hoàn tác về kết quả AI gốc");

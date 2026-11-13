@@ -460,3 +460,46 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261113091934_ThemNgayCapNhatLichSuAI'
+)
+BEGIN
+    ALTER TABLE [LichSuNhanDienAI] ADD [NgayCapNhat] datetimeoffset NOT NULL DEFAULT '0001-01-01T00:00:00.0000000+00:00';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261113091934_ThemNgayCapNhatLichSuAI'
+)
+BEGIN
+    UPDATE [LichSuNhanDienAI] SET [NgayCapNhat] = [NgayTao]
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261113091934_ThemNgayCapNhatLichSuAI'
+)
+BEGIN
+    CREATE INDEX [IX_LichSuNhanDienAI_NgayCapNhat] ON [LichSuNhanDienAI] ([NgayCapNhat]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261113091934_ThemNgayCapNhatLichSuAI'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261113091934_ThemNgayCapNhatLichSuAI', N'8.0.34');
+END;
+GO
+
+COMMIT;
+GO
+

@@ -151,6 +151,7 @@ public class LichSuNhanDienAIConfiguration : IEntityTypeConfiguration<LichSuNhan
         b.Property(x => x.DoTinCay).HasPrecision(4, 3);
         b.HasIndex(x => x.NguoiDungId);
         b.HasIndex(x => x.BuaAnId).IsUnique();
+        b.HasIndex(x => x.NgayCapNhat); // nạp tăng dần cho pipeline
         b.HasOne(x => x.NguoiDung).WithMany().HasForeignKey(x => x.NguoiDungId).OnDelete(DeleteBehavior.NoAction);
     }
 }

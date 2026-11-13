@@ -172,6 +172,9 @@ namespace NutriVision.Infrastructure.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<DateTimeOffset>("NgayCapNhat")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset>("NgayTao")
                         .HasColumnType("datetimeoffset");
 
@@ -200,6 +203,8 @@ namespace NutriVision.Infrastructure.Persistence.Migrations
                     b.HasIndex("BuaAnId")
                         .IsUnique()
                         .HasFilter("[BuaAnId] IS NOT NULL");
+
+                    b.HasIndex("NgayCapNhat");
 
                     b.HasIndex("NguoiDungId");
 

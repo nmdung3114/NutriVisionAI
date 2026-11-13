@@ -16,6 +16,8 @@ public class LichSuNhanDienAI : BaseEntity
     public bool NguoiDungCoSua { get; set; }
     public int? ThoiGianXuLyMs { get; set; }
     public DateTimeOffset NgayTao { get; set; }
+    /// <summary>Lần cuối người dùng chốt/sửa/hoàn tác – dùng cho nạp dữ liệu tăng dần (incremental) của pipeline.</summary>
+    public DateTimeOffset NgayCapNhat { get; set; }
 
     public NguoiDung? NguoiDung { get; set; }
     public BuaAn? BuaAn { get; set; }

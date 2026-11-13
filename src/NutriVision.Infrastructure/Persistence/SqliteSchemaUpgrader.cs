@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace NutriVision.Infrastructure.Persistence;
@@ -7,7 +8,8 @@ namespace NutriVision.Infrastructure.Persistence;
 /// <summary>
 /// Chỉ dùng cho CSDL SQLite ở môi trường dev (tạo bằng EnsureCreated, không có migration):
 /// khi model có thêm bảng mới, tạo các bảng + index còn thiếu mà KHÔNG xóa dữ liệu đang có.
-/// Không xử lý thêm/đổi cột trong bảng cũ (khi đó xóa file App_Data/nutrivision-dev.db để tạo lại).
+/// Thêm được cột mới vào bảng cũ (giá trị mặc định 0/rỗng; cột NgayCapNhat mới lấy theo NgayTao).
+/// Không xử lý đổi kiểu/xóa cột (khi đó xóa file App_Data/nutrivision-dev.db để tạo lại).
 /// Môi trường SQL Server dùng migration EF Core như bình thường.
 /// </summary>
 public static partial class SqliteSchemaUpgrader
@@ -50,6 +52,32 @@ public static partial class SqliteSchemaUpgrader
         }
 
         if (created.Count > 0) logger.LogInformation("SQLite dev: đã tạo bảng mới {Tables}", string.Join(", ", created));
+        await AddMissingColumnsAsync(db, created, logger, ct);
         return created;
+    }
+
+    private static async Task AddMissingColumnsAsync(DbContext db, IReadOnlyCollection<string> justCreated, ILogger logger, CancellationToken ct)
+    {
+        foreach (var et in db.Model.GetEntityTypes())
+        {
+            var table = et.GetTableName();
+            if (table is null || justCreated.Contains(table)) continue;
+            var store = StoreObjectIdentifier.Table(table, et.GetSchema());
+            var existing = (await db.Database.SqlQueryRaw<string>($"SELECT name AS \"Value\" FROM pragma_table_info('{table}')").ToListAsync(ct))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            if (existing.Count == 0) continue;
+
+            foreach (var p in et.GetProperties())
+            {
+                var col = p.GetColumnName(store);
+                if (col is null || existing.Contains(col)) continue;
+                var type = p.GetColumnType();
+                var dflt = p.IsColumnNullable(store) ? "" : type.Contains("TEXT", StringComparison.OrdinalIgnoreCase) ? " NOT NULL DEFAULT ''" : " NOT NULL DEFAULT 0";
+                await db.Database.ExecuteSqlRawAsync($"ALTER TABLE \"{table}\" ADD COLUMN \"{col}\" {type}{dflt}", ct);
+                if (col == "NgayCapNhat" && existing.Contains("NgayTao"))
+                    await db.Database.ExecuteSqlRawAsync($"UPDATE \"{table}\" SET \"NgayCapNhat\" = \"NgayTao\"", ct);
+                logger.LogInformation("SQLite dev: đã thêm cột {Table}.{Column}", table, col);
+            }
+        }
     }
 }
