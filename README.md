@@ -57,6 +57,15 @@ Tài khoản demo (chỉ seed ở Development): `user@nutrivision.ai / User@123`
 
 Email ở môi trường dev **không gửi thật**: nội dung (kèm link xác thực / đặt lại mật khẩu) được ghi vào `src/NutriVision.Api/App_Data/outbox/*.html` và log.
 
+### Chức năng nổi bật
+
+- Quét ảnh món ăn bằng AI → hiệu chỉnh → lưu; ghi nhanh “ăn lại” và món hay ăn
+- Dashboard: vòng dinh dưỡng kiểu Apple Watch, lịch nhiệt theo tháng, chuỗi ngày + 9 huy hiệu, nhận xét tự động theo tuần
+- Theo dõi cân nặng (biểu đồ, đồng bộ hồ sơ) và nước uống (mục tiêu 35 ml/kg)
+- Báo cáo + xuất PDF/CSV, chia sẻ thẻ tổng kết ngày dạng ảnh
+- Chế độ sáng/tối, màu riêng cho từng bữa, giao diện mobile (vuốt để xóa), cài như ứng dụng (PWA), nhắc giờ ăn bằng thông báo
+- Quản trị: thống kê, người dùng, nhật ký hệ thống
+
 ## 3. Cấu hình cho môi trường thật
 
 Mọi khóa bí mật đặt qua biến môi trường (hoặc `dotnet user-secrets`), **không commit vào repo**.
@@ -102,6 +111,9 @@ Tài liệu có một số điểm mâu thuẫn hoặc chưa chốt. Các lựa 
 9. **Ảnh riêng tư**: URL ảnh ký HMAC, hết hạn sau 60 phút, chỉ cấp cho chủ sở hữu. Admin không có API nào trả bữa ăn, ảnh hay hồ sơ người dùng (BR-45…47).
 10. **Dữ liệu thực phẩm tham chiếu**: 110 món/nguyên liệu Việt Nam phổ biến, giá trị gần đúng tổng hợp từ Bảng thành phần thực phẩm Việt Nam/USDA, dùng để minh họa. Trong đề tài, bảng này dự kiến được cung cấp bởi pipeline dbt.
 11. Phạm vi tài liệu `detai.md` (Airflow, dbt, Vault, Superset) là phần **nền tảng dữ liệu**, nằm ngoài repo ứng dụng web này. Schema đã được thiết kế sẵn để pipeline đọc `BuaAn`, `LichSuNhanDienAI` (AI gốc so với người dùng chốt) và `TongHopDinhDuongNgay`.
+12. **Bảng bổ sung**: `NhatKyCanNang`, `NhatKyNuocUong` ngoài ERD gốc, xem `docs/erd-bo-sung.md`.
+13. **Nhắc giờ ăn** chạy trên trình duyệt (không có máy chủ push) nên chỉ nhắc khi ứng dụng đang mở; cài đặt lưu theo thiết bị.
+14. **CSDL SQLite dev** tự bổ sung bảng mới mà không mất dữ liệu; nếu đổi cột của bảng cũ thì xóa `App_Data/nutrivision-dev.db` để tạo lại.
 
 ## 6. Bảo mật đã áp dụng
 

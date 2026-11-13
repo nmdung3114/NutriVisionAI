@@ -132,3 +132,19 @@ Bản nháp `ngayAn` mặc định hôm nay; thành phần của bản nháp do 
 
 ## 11. Tài khoản seed (dev)
 `admin@nutrivision.ai / Admin@123` (ADMIN) · `user@nutrivision.ai / User@123` (USER, có hồ sơ) – đã xác thực email.
+Tài khoản user demo có sẵn ~30 ngày bữa ăn, cân nặng, nước uống (chỉ seed ở dev, khi chưa có lịch sử).
+
+## 12. Thói quen & theo dõi (Bearer)
+
+| Method | Đường dẫn | Mô tả |
+|---|---|---|
+| GET | `/api/dashboard/calendar?nam=&thang=` | Lịch tháng: mỗi ngày đã qua `{ngay, calo, mucTieuCalo, soBuaAn, phanTramMucTieu, trangThai: Thieu/DatChuan/Vuot/null}` |
+| GET | `/api/dashboard/streak` | `{chuoiHienTai, chuoiDaiNhat, homNayDaGhi, tongNgayGhiNhan, tongBuaAn, huyHieu[{ma, ten, moTa, bieuTuong, datDuoc, tienDo, mucTieu}]}` |
+| GET | `/api/dashboard/insights` | Nhận xét 7 ngày: `{tuNgay, denNgay, soNgayCoDuLieu, caloTrungBinh, nhanXet[{ma, loai: CanhBao/ThongTin/TichCuc, tieuDe, noiDung, bieuTuong}]}` |
+| POST | `/api/meals/{id}/repeat` | Body `{loaiBuaAn?, ngayAn?}` → tạo bữa đã xác nhận mới từ bữa cũ (409 nếu là bản nháp) |
+| GET | `/api/meals/frequent?limit=6` | Món hay ăn 90 ngày `[{mauBuaAnId, tenMonAn, soLan, calo, loaiBuaAn, lanCuoi, hinhAnhUrl}]` |
+| GET | `/api/weight?days=90` | `{hienTai, banDau, thayDoi7Ngay, thayDoi30Ngay, chieuCao, bmi, phanLoaiBmi, danhSach[{id, ngay, canNang, ghiChu}]}` |
+| POST | `/api/weight` | Body `{ngay?, canNang (10–150), ghiChu?}`; trùng ngày thì cập nhật; bản mới nhất đồng bộ hồ sơ |
+| DELETE | `/api/weight/{id}` | Xóa bản ghi (403 nếu không phải chủ) |
+| GET | `/api/water?ngay=` | `{ngay, luongMl, mucTieuMl, phanTram, soNgayDatMucTieu7Ngay, bayNgay[{ngay, luongMl}]}` |
+| POST | `/api/water` | Body `{ml (-2000..2000, ≠0), ngay?}`: cộng/hoàn tác, không âm, tối đa 10 000 ml/ngày |
