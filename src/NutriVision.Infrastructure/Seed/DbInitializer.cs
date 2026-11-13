@@ -26,6 +26,10 @@ public static class DbInitializer
         {
             if (db.Database.IsSqlite())
             {
+                // Máy mới clone chưa có thư mục App_Data (bị .gitignore) → tạo trước, SQLite chỉ tự tạo file.
+                var file = new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder(settings.ConnectionString).DataSource;
+                var dir = Path.GetDirectoryName(Path.GetFullPath(file));
+                if (!string.IsNullOrEmpty(dir) && file != ":memory:") Directory.CreateDirectory(dir);
                 // CSDL mới → tạo toàn bộ; CSDL đã có → chỉ bổ sung bảng mới, giữ nguyên dữ liệu.
                 if (!await db.Database.EnsureCreatedAsync(ct)) await SqliteSchemaUpgrader.CreateMissingTablesAsync(db, logger, ct);
             }
